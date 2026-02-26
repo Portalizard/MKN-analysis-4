@@ -1,0 +1,579 @@
+\documentclass[12pt]{article}
+
+\usepackage[T2A]{fontenc}
+\usepackage[english, russian]{babel}
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=2cm,right=2cm,marginparwidth=1.75cm]{geometry}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{bbm}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,     
+    % linkcolor=blue,
+    % pdftitle={Overleaf Example},
+    % pdfpagemode=FullScreen,
+    }
+% \usepackage[normalem]{ulem}
+% \usepackage{graphicx}
+% \usepackage{subcaption}
+% \usepackage{pgfplots}
+% \pgfplotsset{width=10cm,compat=1.18}
+% \usepgfplotslibrary{external}
+% \tikzexternalize[prefix=tikz/]
+% \tikzexternaldisable
+% \usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary {arrows.meta}
+\usetikzlibrary {decorations.pathmorphing}
+\usetikzlibrary {decorations.markings}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\renewcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\ind}{\mathbbm{1}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\vol}{\operatorname{vol}}
+\newcommand{\Fr}{\operatorname{Fr}}
+\newcommand{\Gal}{\operatorname{Gal}}
+\newcommand{\id}{\operatorname{id}}
+\newcommand{\Aut}{\operatorname{Aut}}
+\newcommand{\End}{\operatorname{End}}
+\newcommand{\inter}{\cap}
+\newcommand{\union}{\cup}
+\newcommand{\Ra}{\Rightarrow}
+\newcommand{\La}{\Leftarrow}
+\renewcommand{\iff}{\Leftrightarrow}
+\newcommand{\todo}[1]{\colorbox{red}{#1}}
+
+\newcounter{cnt}
+
+\newtheoremstyle{defnote}
+{\topsep}
+{\topsep}
+{}
+{}
+{\bfseries}
+{.}
+{ }
+{\thmname{#1}\thmnumber{ #2}\thmnote{ (#3)}}
+
+\newtheoremstyle{thmnote}
+{\topsep}
+{\topsep}
+{\itshape}
+{}
+{\bfseries}
+{.}
+{ }
+{\thmname{#1}\thmnumber{ #2}\thmnote{ (#3)}}
+
+\theoremstyle{thmnote}
+\newtheorem{theorem}[cnt]{Теорема}
+\newtheorem{lemma}[cnt]{Лемма}
+\newtheorem{proposition}[cnt]{Предложение}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Замечание}
+
+\theoremstyle{defnote}
+\newtheorem{definition}[cnt]{Определение}
+
+
+
+\begin{document}
+
+\title{Матанализ, 4 семестр}
+\author{}
+\date{}
+\maketitle
+
+\section*{Комплексный анализ}
+
+Будем рассматривать функции из $\C$ в $\C$. По умолчанию отождествляем комплесные числа с их координатными представлениями, а также функции с их координатными представлениями: $z = x + iy,\, f(z) = u(z) + i v(z) = u(x, y) + i v(x, y)$.
+
+\begin{definition}[Голоморфная функция]
+    Функция $f: \C \to \C$ называется \textit{голоморфной в области} $G \subset \C$, если $\forall z_0 \in G \,\exists \underset{z \to z_0}{\lim} \frac{f(z) - f(z_0)}{z - z_0}$.
+\end{definition}
+
+\begin{definition}[Комплексная производная]
+    Если предел $\underset{z \to z_0}{\lim} \frac{f(z) - f(z_0)}{z - z_0}$ существует, он называется \textit{производной} функции $f$ в точке $z_0$ и обозначается $f'$.
+\end{definition}
+
+Из существования такого предела следует условие Коши-Римана: рассмотрим $\varepsilon \in \R$. Тогда:
+\[
+    \underset{\varepsilon \to 0}{\lim} \frac{f(z_0 + \varepsilon) - f(z_0)}{\varepsilon} = u_x'(x_0, y_0) + i v_x'(x_0, y_0)
+\]
+\[
+    \underset{\varepsilon \to 0}{\lim} \frac{f(z_0 + i \varepsilon) - f(z_0)}{i \varepsilon} = v_y'(x_0, y_0) - i u_y'(x_0, y_0)
+\]
+
+Поскольку эти пределы должны быть равны, должны быть равны их вещестенные и комплексные компоненты. Таким образом выполняются равенства $u_x' = v_y', u_y' = -v_x'$, то есть в точности условия Коши-Римана.
+
+Аналогично вещественному случаю, выполнена формула
+\[
+    f(z) = f(z_0) + f'(z_0)(z - z_0) + o(|z - z_0|)
+\]
+и её выполнение в точности эквивалентно дифференцируемости $f$ в точке $z_0$.
+
+Верно и обратное: если для $u, v$ в точке $z_0$ выполнены условия Коши-Римана, то $f$ дифференцируема в $z_0$:
+\[
+    u_x' = v_y' = a, \quad u_y' = -v_x' = -b
+\]
+\[
+    u(x_0 + \Delta x, y_0 + \Delta y) = u(x_0, y_0) + a(x_0, y_0) \Delta x - b(x_0, y_0) \Delta y + o(\sqrt{\Delta x^2 + \Delta y^2})
+\]
+\[
+    v(x_0 + \Delta x, y_0 + \Delta y) = v(x_0, y_0) + b(x_0, y_0) \Delta x + a(x_0, y_0) \Delta y + o(\sqrt{\Delta x^2 + \Delta y^2})
+\]
+Домножив второе равенство на $i$ и прибавив результат к первому равенству, получим в точности формулу, эквивалентную дифференцируемости $f$ в $z_0$.
+
+
+\begin{definition}[Аналитическая функция]
+    Функция $f: \C \to \C$ называется \textit{аналитической в области} $G \subset \C$, если $\forall z_0 \in G \,\exists R > 0 \,\exists \{a_i\} \,\forall z \in B_R(z_0) \big(f(z) = \sum_{k = 0}^{\infty} a_k (z - z_0)^k\big)$
+\end{definition}
+
+\begin{theorem}
+\label{analit_holom}
+    $f: \C \to \C$, $G \subset \C$ - область. $f$ - аналитична в $G$ $\iff$ $f$ - голоморфна в $G$.
+\end{theorem}
+\begin{proof}
+    $\Ra$: Если функция $f$ - аналитична, она локально предсталяется в виде степенного ряда. Поскольку этот ряд сходится равномерно, его можно почленно дифференцировать. Тогда у него существует производная, а значит, функция $f$ - голоморфна. \\ $\La$: будем доказывать 2 лекции...
+\end{proof}
+
+\begin{proposition}
+    $f$ аналитична в $G$ $\Ra$ $\forall z_0 \in G \,\exists r > 0 \,\forall z, |z - z_0| < r \,\forall \partial D \subset B_r(z_0)$\\ $\left( \int_{\partial D} f(z)dz = 0 \right)$.
+\end{proposition}
+\begin{proof}
+    $f$ аналитична $\Ra$ $f(z) = \sum a_n (z - z_0)^n$. Не умаляя общности, будем считать $z_0 = 0$.
+    \begin{equation*}
+        z^n dz = d\left( \frac{z^{n+1}}{n+1} \right) \Ra \int_{\partial D} z^n dz = \int_D d(z^n dz) = \int_D d\left(d\left(\frac{z^{n+1}}{n+1}\right)\right) = \int_D 0 = 0
+    \end{equation*}
+    По аддитивности интеграла, $\int_D f(z)dz = 0$.
+\end{proof}
+
+\begin{proposition}
+\label{4eqiuv}
+    \todo{Следующие утверждения эквивалентны}:
+    \begin{enumerate}
+        \item $\int_{\gamma} f(z)dz$ зависит только от $\gamma(0), \gamma(1)$.
+        \item Если $\gamma$ - замкнутый путь, то $\int_{\gamma} f(z)dz = 0$.
+        \item У $f(z)dz$ существует первообразная.
+        \item Для любого прямоугольника $P$ со сторонами, параллельными осям, $\int_{\partial P} f(z)dz = 0$.
+    \end{enumerate}
+\end{proposition}
+\begin{proof}
+    $(1) \iff (2)$: очевидно. \\
+    $(3) \Ra (2)$: очевидно. \\
+    $(2) \Ra (4)$: очевидно. \\
+    $(4) \Ra (3)$: предъявим кандидата на первообразную: $F(z) = \int_0^x f(s)ds + \int_{x}^{x+iy} f(s)ds$, где $z = x + iy$. Проверим, что производная $F$ равняется $f$. Для этого достаточно показать, что для $F$ выполняются условия Коши-Римана, и частные производные $F$ по $x, y$ равны $f(z)$:
+    \begin{gather*}
+        \underset{\varepsilon \to 0}{\lim} \frac{F(z + i\varepsilon) - F(z)}{i\varepsilon} = \underset{\varepsilon \to 0}{\lim} \frac{1}{i\varepsilon} \int_{[z, z + \varepsilon]} f(s)ds = \underset{\varepsilon \to 0}{\lim} \frac{1}{i\varepsilon} \int_0^1 f(z + ti\varepsilon)dt = \\
+         = \frac{1}{i\varepsilon} \int_0^1 f(z + ti\varepsilon)dt = \frac{1}{i} \int_0^{\varepsilon} f(z + ti)dt = f(z)
+    \end{gather*}
+    где последнее равенство выполнено в силу равномерной непрерывности $f$ на отрезке. \todo{В силу условия} (4):
+    \begin{gather*}
+        \lim \frac{F(z + \varepsilon) - F(z)}{\varepsilon} = \lim \frac{1}{\varepsilon} \int_{[z, z+\varepsilon]} f(z)dz = f(z)
+    \end{gather*}
+\end{proof}
+
+\begin{remark}
+    Будем говорить, что функция голоморфна/аналитична на множестве $M$, если найдётся область $G$ такая, что $M \subset G$ и функция голоморфна/аналитична в области $G$.
+\end{remark}
+
+\begin{theorem}
+\label{circ_holom}
+    $f$ голоморфна в замкнутом круге $\overline{B_r}$ $\Ra$ для любого прямоугольника $P \subset B_r$ со сторонами, параллельными осям, $\int_{\partial P} f(z)dz = 0$.
+\end{theorem}
+\begin{proof}
+    Предположим противное, то есть нашёлся такой прямоугольник $P$, что $\int_{\partial P} f(z)dz = a \neq 0$. Разделим $P$ на четыре меньших прямоугольника:
+
+    \begin{center}
+    \begin{tikzpicture}
+        \begin{scope}[very thick, decoration={markings, mark=at position 0.5 with {\arrow{>}}}, >=Stealth]
+            \draw[postaction={decorate}] (0,0) -- node[below]{$B$} (4,0);
+            \draw[postaction={decorate}] (4,0) -- (4,2);
+            \draw[postaction={decorate}] (4,2) -- (0,2);
+            \draw[postaction={decorate}] (0,2) -- node[left]{$A$} (0,0);
+            \path (1.2,1.5) node{$P$};
+            \path (10,2) node{$P_2$};
+            \path (7,2) node{$P_1$};
+            \path (7,0) node{$P_3$};
+            \path (10,0) node{$P_4$};
+
+            \path (7,1) node{$+$};
+            \path (10,1) node{$+$};
+            \path (8.5,0) node{$+$};
+            \path (8.5,2) node{$+$};
+            
+            \foreach \y in {-0.5, 1.5}
+                \foreach \x in {6, 9}
+                {
+                    \begin{scope}[xshift=\x cm, yshift=\y cm]
+                        \draw[postaction={decorate}] (0,0) -- (2,0);
+                        \draw[postaction={decorate}] (2,0) -- (2,1);
+                        \draw[postaction={decorate}] (2,1) -- (0,1);
+                        \draw[postaction={decorate}] (0,1) -- (0,0);
+                    \end{scope}
+                }
+            
+        \end{scope}
+
+        \draw [->,decorate,decoration={snake,amplitude=.4mm,segment length=2mm,post length=1mm}, thick]
+            (4.5,1) -- (5.5,1);
+        \draw[dashed] (2,0) -- (2,2) (0,1) -- (4,1);
+        \path (6,0) node[left]{$\frac{A}{2}$};
+        \path (6,2) node[left]{$\frac{A}{2}$};
+        \path (7,-0.5) node[below]{$\frac{B}{2}$};
+        \path (10,-0.5) node[below]{$\frac{B}{2}$};
+    \end{tikzpicture}
+    \end{center}
+
+    \begin{equation*}
+        \int_{\partial P} f(z)dz = \underset{i}{\sum} \int_{\partial P_i} f(z)dz = a \Ra \exists i \left( \left| \int_{\partial P_i} f(z)dz \right| \geq \frac{|a|}{4} \right) 
+    \end{equation*}
+
+    Обозначим $P^1 = P_i$, после чего разделим уже $P_i$ на 4 части аналогичным образом. Часть с наибольшим модулем интеграла Обозначим $P^2$. Продолжая прямоугольники с большим модулем интеграла, получим последовательность вложенных прямоугольников $P^1, P^2, \hdots$ причём $\left| \int_{\partial P^n} f(z)dz \right| \geq \frac{|a|}{4^n}$. Отметим, что если стороны $P$ имели длину $A, B$, то стороны $P^n$ будут иметь длину $\frac{A}{2^n}, \frac{B}{2^n}$. Обозначим $\inter_n P^n = z_0$.
+
+    \begin{gather*}
+        f(z) = f(z_0) + f'(z_0)(z - z_0) + \varphi(z) \\
+        \int_{\partial P^n} f(z)dz = \int_{\partial P^n} f(z_0) + f'(z_0)(z - z_0) + \int_{\partial P^n} \varphi(z)dz
+    \end{gather*}
+
+    Первый интеграл является интегралом многочлена по замкнутому контуру; у многочлена есть первообразная, а значит, по предложению \ref{4eqiuv}, этот интеграл равняется 0. Оценим второй интеграл: поскольку $\varphi = o(|z - z_0|)$, начиная с какого-то $n$ $|\varphi(z)| \leq \varepsilon |z - z_0|$. Тогда
+
+    \begin{equation*}
+        \left| \int_{\partial P^n} \varphi(z)dz \right| \leq \int_{\partial P^n} \left| \varphi(z)dz \right| \leq \frac{2A + 2B}{2^n} \cdot \varepsilon \frac{A+B}{2^n} \leq 2(A+B)^2 \frac{\varepsilon}{4^n} \underset{\varepsilon \to 0}{\longrightarrow} 0
+    \end{equation*}
+
+    Поскольку эта оценка верна для любого $\varepsilon$, $\int_{\partial P^n} \varphi(z)dz = 0$, а значит, и $\int_{\partial P^n} f(z)dz = 0$, но по предположению $\left| \int_{\partial P^n} f(z)dz \right| \geq \frac{|a|}{4^n}$. Получили противоречие, значит, утверждение теоремы выполнено.
+
+\end{proof}
+
+\begin{lemma}[об устранимой особенности]
+\label{noness}
+    $z_0 \in \C$, $R > 0$. $f$ - непрерывна и ограничена в $B_R(z_0) \backslash \{z_0\}$. Для любого прямоугольника $P \subset B_R(z_0)$ со сторонами, параллельными осям, такого что $z_0 \not\in P$, $\int_{\partial P} f(z)dz = 0$. Тогда это же верно и для $P$ таких что $z_0 \in P$.
+\end{lemma}
+\begin{remark}
+    Если заменить шар $B_R(z_0)$ на его замыкание, лемма останется верной и доказывается аналогично.
+\end{remark}
+\begin{proof}
+    Достаточно доказать для $P$ таких, что $z_0 \in \partial P$, так как если $z_0$ лежит строго внутри $P$, то $P$ можно разделить на два прямоугольника $P_1, P_2$ таких, что $z_0 \in \partial P_1, \partial P_2$:
+
+    \begin{center}
+    \begin{tikzpicture}
+        \begin{scope}[very thick, decoration={markings, mark=at position 0.6 with {\arrow{>}}}, >=Stealth]
+            \draw[postaction={decorate}] (0,0) -- (3,0);
+            \draw[postaction={decorate}] (3,0) -- (3,2);
+            \draw[postaction={decorate}] (3,2) -- (0,2);
+            \draw[postaction={decorate}] (0,2) -- (0,0);
+            \path (1.2,1.3) node{$P$};
+            \draw[postaction={decorate}] (5,0) -- (7,0);
+            \draw[postaction={decorate}] (7,0) -- (7,2);
+            \draw[postaction={decorate}] (7,2) -- (5,2);
+            \draw[postaction={decorate}] (5,2) -- (5,0);
+            \path (6,1.3) node{$P_1$};
+            \path (7.5,1) node{$+$};
+            \draw[postaction={decorate}] (8,0) -- (9,0);
+            \draw[postaction={decorate}] (9,0) -- (9,2);
+            \draw[postaction={decorate}] (9,2) -- (8,2);
+            \draw[postaction={decorate}] (8,2) -- (8,0);
+            \path (8.5,1.3) node{$P_2$};
+        \end{scope}
+        \fill (2,0.5) circle[radius=2pt] node[below right]{$z_0$};
+        \draw[dashed] (2,0) -- (2,2);
+
+        \draw [->,decorate,decoration={snake,amplitude=.4mm,segment length=2mm,post length=1mm}, thick]
+            (3.5,1) -- (4.5,1);
+
+        \fill (7,0.5) circle[radius=2pt] node[left]{$z_0$};
+        \fill (8,0.5) circle[radius=2pt] node[right]{$z_0$};
+    \end{tikzpicture}
+    \end{center}
+
+    Заметим, что $P$ можно разделить на две части: тонкую полосу шириной $\varepsilon$ $Q_{\varepsilon}$, которая содержит на своей границе $z_0$, и остальная часть прямоугольника $P_{\varepsilon}$. Поскольку $P_{\varepsilon}$ по построению не содержит $z_0$, интеграл $f$ по $\partial P_{\varepsilon}$ будет равен 0. Значит, для всякого $\varepsilon$ интеграл по $\partial P$ равен интегралу по $\partial Q_{\varepsilon}$.
+
+    \begin{center}
+    \begin{tikzpicture}
+        \begin{scope}[very thick, decoration={markings, mark=at position 0.6 with {\arrow{>}}}, >=Stealth]
+            \draw[postaction={decorate}] (0,0) -- (3,0);
+            \draw[postaction={decorate}] (3,0) -- (3,2);
+            \draw[postaction={decorate}] (3,2) -- (0,2);
+            \draw[postaction={decorate}] (0,2) -- (0,0);
+            \path (1.2,1.3) node{$P$};
+            \draw[postaction={decorate}] (5,0) -- (7,0);
+            \draw[postaction={decorate}] (7,0) -- (7,2);
+            \draw[postaction={decorate}] (7,2) -- (5,2);
+            \draw[postaction={decorate}] (5,2) -- (5,0);
+            \path (6,1.3) node{$P_{\delta}$};
+            \path (7.5,1) node{$+$};
+            \draw[postaction={decorate}] (8,0) -- (9,0);
+            \draw[postaction={decorate}] (9,0) -- (9,2);
+            \draw[postaction={decorate}] (9,2) -- (8,2);
+            \draw[postaction={decorate}] (8,2) -- (8,0);
+            \path (9.5,1.5) node{$Q_{\delta}$};
+        \end{scope}
+
+        \fill (3, 0.5) circle[radius=2pt] node[below right]{$z_0$};
+        \fill (9, 0.5) circle[radius=2pt] node[below right]{$z_0$};
+        \draw [->,decorate,decoration={snake,amplitude=.4mm,segment length=2mm,post length=1mm}, thick]
+            (3.5,1) -- (4.5,1);
+        \draw[<->, semithick] (8,1.5) -- node[below]{$\delta$} (9,1.5);
+    \end{tikzpicture}
+    \end{center}
+
+    Так как $P$ --- компакт, а $f$ непрерывна на $P$, то $f$ и равномерно непрерывна на $P$. Интеграл по $\partial Q_{\delta}$ равен сумме четырёх интегралов по сторонам. Две стороны имеют длину $\delta$, и по равномерной непрерывности $f$ модуль интеграла по ним оценивается сверху $2 \delta \varepsilon$, где $\varepsilon$ из определения равномерной непрерывности. Оставшиеся две стороны проходятся в разных направлениях и лежат на расстоянии $\delta$, а значит, модуль разности интегралов по ним тоже линейно оценивается через $\varepsilon$ в силу равномерной непрерывности.
+
+    \begin{gather*}
+        \left| \int_{\partial P} f(z)dz \right| = \left| \int_{\partial Q_{\delta}} f(z)dz \right| \leq C \varepsilon + \left| \int_a^b f(t + \delta) - f(t) dt \right| \\
+        \left| \int_a^b f(t + \delta) - f(t) dt \right| \leq \int_a^b |f(t + \delta) - f(t)| dt \leq (b - a) \varepsilon
+    \end{gather*}
+
+    Поскольку при $\delta \to 0$ $\varepsilon \to 0$, $\int_{\partial P} f(z)dz = 0$, что и требовалось доказать.
+\end{proof}
+
+\begin{proposition}
+    $f$ голоморфна в круге $\Ra$ $\oint_{\gamma} f(z)dz = 0$.
+\end{proposition}
+\begin{proof}
+    Достаточно применить теорему \ref{circ_holom} и предложение \ref{4eqiuv}.
+\end{proof}
+
+\begin{proposition}
+    $f$ голоморфна в $G$, $a \in \overline{B_r(a)} \subset G$, $\gamma \subset B_r(a)$ - замкнутый путь. Тогда $\forall z \in B_r(a) \left( f(z) = \frac{1}{2 \pi i} \oint_{\gamma} \frac{f(w)dw}{w - z} \right)$.
+\end{proposition}
+\begin{proof}
+    $G$ --- открытая область, $\overline{B_r(a)} \subset G \Ra \exists \varepsilon > 0 \left( B_{r + \varepsilon}(a) \subset G \right)$.
+
+    Зафиксируем $z \in B_{r}(a)$ и определим функцию $g: B_{r + \varepsilon}(a)\backslash\{z\} \to \C$, $g(w) = \frac{f(z) - f(w)}{z - w}$. $g$ голоморфна в $B_{r + \varepsilon}(a)\backslash\{z\}$, значит, по аналогии с теоремой \ref{circ_holom}, для любого прямоугольника $P \subset B_{r + \varepsilon}(a)\backslash\{z\}$ со сторонами, параллельными осям, $\int_{\partial P} g(w)dw = 0$. Значит, можно воспользоваться леммой \ref{noness} и получить, что это верно и для любого $P \subset B_{r + \varepsilon}(a)$. По предложению \ref{4eqiuv}, это эквивалентно тому, что $\int_{\gamma} g(w)dw = 0$ для любого замкнутого пути $\gamma \subset B_{r + \varepsilon}(a)$. Обозначим $S_r = \partial B_r(a) \subset B_{r + \varepsilon}(a)$ --- замкнутый путь. Тогда
+
+    \begin{gather*}
+        \forall z \in B_r(a) \left( \int_{S_r} \frac{f(z) - f(w)}{z - w}dw = \int_{S_r} g(w)dw = 0 \right) \Ra \\
+        \Ra \int{S_r} \frac{f(w)}{z - w}dw = \int_{S_r} \frac{f(z)}{z - w}dw = f(z) \int_{S_r} \frac{dw}{z - w}
+    \end{gather*}
+
+    Вычислим $\int_{S_r} \frac{dw}{z - w}$. Заметим, что $w \in S_r \iff |w - a| = r > |z - a|$. Тогда
+
+    \begin{align*}
+        \frac{1}{z - w} & = \frac{1}{(z - a) - (w - a)} \\&= - \frac{1}{w - a} \cdot \frac{1}{1 - \frac{z - a}{w - a}} \\&= - \frac{1}{w - a} \underset{n = 0}{\overset{\infty}{\sum}} \left( \frac{z - a}{w - a} \right)^n \\&= - \underset{n = 0}{\overset{\infty}{\sum}} \frac{(z - a)^n}{(w - a)^{n+1}}
+    \end{align*}
+
+    Посчитаем $\int_{S_r}$ от каждого слагаемого этого ряда. Для этого достаточно посчитать интеграл от знаменателя каждого слагаемого, так как числители не зависят от переменной интегрирования $w$.
+
+    \begin{gather*}
+        w = a + r e^{it},\, t \in [0, 2\pi) \Ra \int_{S_r} \frac{dw}{(w - a)^n} = \int_{0}^{2\pi} \frac{d\left(a + re^{it}\right)}{r^ne^{int}} = \int_{0}^{2\pi} \frac{d\left(re^{it}\right)}{r^ne^{int}} =\\= r^{-n+1} \int_{0}^{2\pi} e^{-int} d\left(e^{it}\right) = i r^{-n+1} \int_{0}^{2\pi} e^{-int} dt = \begin{cases}
+            0, & n \neq 1 \\ 2\pi i, & n = 1
+        \end{cases}
+    \end{gather*}
+    
+    Таким образом получаем, что
+
+    \begin{gather*}
+        \int_{S_r} \frac{1}{z - w} = - \underset{n = 0}{\overset{\infty}{\sum}} \int_{S_r} \frac{(z - a)^n}{(w - a)^{n+1}} = - 2\pi i \Ra\\\Ra \int_{S_r} \frac{f(w)}{z - w}dw = (- 2\pi i) f(z) \Ra\\\Ra f(z) = \frac{1}{2\pi i} \int_{S_r} \frac{f(w)}{w - z}dw
+    \end{gather*}
+\end{proof}
+
+\begin{remark}
+    \todo{Подставляем ряд в интеграл}, используем единственность ряда Тейлора, и получаем что доказали теорему \ref{analit_holom}.
+\end{remark}
+
+\begin{remark}
+    \todo{Радиус круга аналитичности равен радиусу сходимости ряда.}
+\end{remark}
+
+\begin{theorem}[Мореры]
+\label{Morera}
+    $G$ - область. Следующие утверждения эквивалентны:
+    \begin{enumerate}
+        \item $f$ аналитична в $G$
+        \item $f$ голоморфна в $G$
+        \item $f(z)dz$ локально точна в $G$
+    \end{enumerate}
+\end{theorem}
+\begin{proof}
+    $(1) \iff (2)$: утверждение теоремы \ref{analit_holom}.\\
+    $(2) \Ra (3)$: достаточно применить теорему \ref{circ_holom} и предложение \ref{4eqiuv}.\\
+    $(3) \Ra (2)$: \todo{чё-то сказали пару слов каких-то}.
+\end{proof}
+
+\begin{definition}[Гармоническая функция]
+    $f: \C \to \C$ называется \textit{гармонической}, если её вещественная часть $u$ гармонична как функция из $\R^2 \to R$.
+\end{definition}
+
+\begin{remark}
+    \todo{Что-то про гармоничность и условия Коши-Римана.}
+\end{remark}
+
+\begin{remark}
+    \begin{equation}\tag{$\star$}
+        f(z) = \frac{1}{2\pi} \int_{0}^{2\pi} f(z + re^{it})dt = \frac{1}{2\pi i} \int_{S_r} \frac{f(w)}{w - z}dw
+    \end{equation}
+\end{remark}
+
+\begin{proposition}[Принцип максимума]
+    $G$ --- ограниченная область, $f$ аналитична в $\overline{G}$.\\ Тогда $\underset{z \in \overline{G}}{\max} |f(z)| = \underset{z \in \partial G}{\max} |f(z)|$.
+\end{proposition}
+\begin{proof}
+    Неравенство $\underset{z \in \overline{G}}{\max} |f(z)| \geq \underset{z \in \partial G}{\max} |f(z)|$ очевидно. $\underset{z \in \overline{G}}{\max} |f(z)|$ достигается, так как $\overline{G}$ замкнута и ограничена, следовательно, компактна. Пусть он достигается в точке $z_0 \notin \partial G$. Тогда $dist(z_0, \partial G) = r > 0$, и $(B_r(z_0) \subset G)$. Если $\underset{z \in \overline{G}}{\max} |f(z)| > \underset{z \in \partial G}{\max} |f(z)|$, то \todo{по непрерывности} $f(z_0) > \int_0^{2\pi} f(z_0 + re^{it})dt$, что противоречит $(\star)$.
+\end{proof}
+
+\begin{remark}
+    Если $\exists z_0 \in G \left(|f(z_0)| = \max_{\partial G}|f(z)|\right)$, то, поскольку выполнено $(\star)$, в некоторой окрестности $z_0$ выполнено $f(z) = f(z_0)$. Так как это выполнено для любой точки, в которой достигается максимум, множество таких точек открыто. По непрерывности $f$ это множество также и замкнуто. Поскольку область $G$ связна, это множество есть всё $G$.
+
+    Это рассуждение называют \textit{строгим принципом максимума}.
+\end{remark}
+
+\begin{proposition}
+    $G$ --- связная область, $f, g$ аналитичны в $G$, и в открытом $U \subset G$ $f \equiv g$. Тогда $f \equiv g$ во всём $G$.
+\end{proposition}
+\begin{proof}
+    $f - g$ --- аналитическая функция, $f - g \equiv 0$ на $U$. Тогда \todo{???}
+\end{proof}
+
+\begin{proposition}
+    $f, g$ аналитичны в $G$, $\{\lambda_n\} \subset \C$, $\lambda_n \longrightarrow a \in G$, $f(\lambda_n) = g(\lambda_n)$. Тогда $f \equiv g$ в $G$.
+\end{proposition}
+\begin{proof}
+    $f - g = \sum c_n (z - a)^n$. $(f-g)(\lambda_n) = 0 \Ra (f-g)(a) = 0 \Ra c_0 = 0$. Пусть $c_{n_0}$ - первый ненулевой коэффициент. $f(z) = (z - a)^{n_0} \sum_{k = 0}^{\infty} c_{n_0 + k} (z - a)^k = (z - a)^{n_0} \tilde{f}(z)$. $\tilde{f}(\lambda_n) = 0 \Ra \tilde{f}(a) = 0 \Ra c_{n_0} = 0$. Значит, все $c_n = 0$, значит, $f - g \equiv 0$.
+\end{proof}
+
+\begin{definition}[Целая функция]
+    $f$ --- целая $\iff$ $f$ аналитична на $\C$.
+\end{definition}
+
+\begin{theorem}[Лиувилля]
+\label{liuv}
+    $F$ --- целая ограниченная функция $\Ra$ $F \equiv const$.
+\end{theorem}
+\begin{proof}
+    $F(z) = \sum c_n z^n$ сходится $\forall z \in \C$. Как уже известно,
+    \begin{equation*}
+        c_n = \frac{1}{2 \pi i} \int_{S_r} \frac{F(w)}{w^{n+1}} dw
+    \end{equation*}
+    \begin{equation*}
+        |c_n| \leq \underset{|z| = r}{\max} |F(z)| \cdot \frac{1}{2 \pi} \cdot 2 \pi r \cdot \frac{1}{r^{n+1}} = \frac{\underset{|z| = r}{\max} |F(z)|}{r^n} \leq \frac{c}{r^n} \underset{r \to +\infty}{\longrightarrow} 0
+    \end{equation*}
+
+    Значит, $c_n = 0$ для $n > 0$.
+\end{proof}
+
+\begin{remark}
+    Обозначим, $M_F(r) = \underset{|z| = r}{\max} |F(z)|$. Из доказательства следует, что если $M_F(z) \leq c r^N$, то при $n > N$ $c_n = 0$, то есть $F$ - многочлен $\deg \leq N$.
+\end{remark}
+
+\begin{theorem}[Основная теорема алгебры]
+    У многочлена $\deg = n \geq 1$ ровно $n$ корней с учётом кратности.
+\end{theorem}
+\begin{proof}
+    Достаточно найти 1 корень.
+    \begin{equation*}
+        |p(z)| = |a_n z^n + \dots + a_0| = \left|a_n z^n \left(1 + \frac{a_{n-1}}{a_n} \frac{1}{z} + \dots \right)\right| \geq a_n |z|^n \left(1 - \left|\frac{a_{n-1}}{a_n}\right| \frac{1}{|z|} - \dots\right) \geq \frac{a_n}{2} |z|^n
+    \end{equation*}
+    для достаточно больших $|z|$.
+
+    Если у $p$ нет корней, $\frac{1}{p(z)}$ --- голоморфная ограниченная функция в $\C$. Тогда по теореме \ref{liuv} $\frac{1}{p(z)} \equiv const \Ra p(z) \equiv const$, что невозможно, если $\deg(p) > 0$.
+\end{proof}
+
+\begin{remark}
+    \todo{что-то про Римоновы поверхности}.
+\end{remark}
+
+\begin{definition}[Гомотопия]
+    Непрерывная функция $H: [a, b] \times [0, 1] \to G \subset \C$ называется гомотопией.
+\end{definition}
+
+\begin{remark}
+    Далее в курсе гомотопией будет называться гомотопия с фиксированными концами, то есть $H(a, t) \equiv const$, $H(b, t) \equiv const$. Два пути $\gamma_0, \gamma_1: [a, b] \to G$ называются \textit{гомотопными}, если $\gamma_0(a) = \gamma_1(a)$, $\gamma_0(b) = \gamma_1(b)$, и существует гомотопия $H$ такая, что $H(x, 0) = \gamma_0$, $H(x, 1) = \gamma_1$. Отношение гомотопности обозначается $\gamma_0 \sim \gamma_1$.
+
+    \begin{center}
+    \begin{tikzpicture}
+        
+    \end{tikzpicture}
+    \end{center}
+\end{remark}
+
+\begin{theorem}
+    $f$ голоморфна в $G$, $\gamma_0 \sim \gamma_1 \Ra \int_{\gamma_0} f(z)dz = \int_{\gamma_1} f(z)dz$.
+\end{theorem}
+\begin{proof}
+    $H([a, b] \times [0, 1])$ --- компакт. Выберем у него конечное покрытие $B_1, \dots, B_N \subset G$. \todo{По лемме Лебега} для достаточно малого $\varepsilon > 0$ образ при $H$ любого прямоугольника со сторонами меньше $\varepsilon$ целиком попадает в какой-нибудь $B_l$.
+
+    Разобьём $[a, b] \times [0, 1]$ на такие прямоугольники $\Delta_{jk}$, $1 \leq j \leq m$, $1 \leq k \leq n$.
+
+    \begin{center}
+    \begin{tikzpicture}
+        
+    \end{tikzpicture}
+    \end{center}
+
+    $H(\Delta_{jk}) \subset B_l$, $f$ аналитична в $B_l$, значит
+    \begin{equation*}
+        \int_{H(\partial ([a, b] \times [0, 1]))} f(z)dz = \underset{j, k}{\sum} \int_{H(\partial \Delta_{jk})} f(z)dz = 0
+    \end{equation*}
+    \begin{gather*}
+        \int_{H(\partial([a, b] \times [0, 1]))} f(z)dz = \int_{H([a, b] \times \{0\})} + \int_{H(\{b\} \times [0, 1])} + \int_{H([b, a] \times \{1\})} + \int_{H(\{a\} \times [1, 0])} = \\
+        = \int_{\gamma_0} + \int_{\gamma_i(b)} - \int_{\gamma_1} - \int_{\gamma_i(a)} = \int_{\gamma_0} f(z)dz + 0 - \int_{\gamma_1} f(z)dz - 0 = 0
+    \end{gather*}
+    \begin{equation*}
+        \int_{\gamma_0} f(z)dz = \int_{\gamma_1} f(z)dz
+    \end{equation*}
+\end{proof}
+
+\begin{definition}[Односвязность]
+    Область $G \subset \C$ называется односвязной, если любая петля в $G$ гомотопна тривиальной.
+\end{definition}
+
+\begin{theorem}
+    $f$ аналитична в кольце $A_{r, R} = \{z \,|\, r < |z - a| < R\}$. Тогда $f(z) = \sum_{n \in \Z} c_n (z - a)^n$.
+\end{theorem}
+
+\begin{remark}
+    В таком представлении $\sum_{n < 0}$ называется главной частью, а $\sum_{n \geq 0}$ --- аналитической частью. Аналитическая часть аналитична в $B_R(a)$, главная часть аналитична в $A_{r, R}$, поскольку она представляется как ряд от $1 - \frac{z}{a}$.
+\end{remark}
+
+\begin{proof}
+    $\gamma_0 = \partial B_{R - \varepsilon}(a)$, $\gamma_1 = - \partial B_{r + \varepsilon}(a)$ (обход окружности в обратном направлении, то есть по часовой стрелке), $\gamma_+ = [a + r + \varepsilon, a + R - \varepsilon]$, $\gamma_- = - \gamma_+$.
+
+    \begin{center}
+    \begin{tikzpicture}
+        
+    \end{tikzpicture}
+    \end{center}
+
+    Обозначим $\gamma = \gamma_0 \union \gamma_1 \union \gamma_+ \union \gamma_-$. $\gamma \sim 0$, $f$ аналитична, значит, $\int_{\gamma} f(z)dz = 0$. Тогда $\int_{\gamma} \frac{f(z) - f(w)}{z - w}dw = 0$. В $A_{r, R}$ выполнена формула Коши, потому что $\gamma \sim \partial B_{\varepsilon}(z)$.
+    \begin{equation*}
+        \int_{\gamma} \frac{f(w)}{w - z} dw = 0
+    \end{equation*}
+    \begin{equation*}
+        \int_{\gamma} \frac{f(w)}{w - z} dw = \int_{\gamma_0} \frac{f(w)}{w - z}dw + \int_{\gamma_1} \frac{f(w)}{w - z}dw
+    \end{equation*}
+    \begin{equation*}
+        |w - a| = R - \varepsilon \Ra \frac{1}{w - z} = \frac{1}{(w - a) - (z - a)} = \frac{1}{w - a} \cdot \frac{1}{1 - \frac{z - a}{w - a}} = \underset{n = 0}{\overset{\infty}{\sum}} \frac{(z - a)^n}{(w - a)^{n+1}}
+    \end{equation*}
+    \begin{equation*}
+        |w - a| = r + \varepsilon \Ra \frac{1}{w - z} = \frac{1}{(w - a) - (z - a)} = \frac{1}{z - a} \cdot \frac{1}{\frac{w - a}{z - a} - 1} = - \underset{n = 0}{\overset{\infty}{\sum}} \frac{(w - a)^n}{(z - a)^{n+1}}
+    \end{equation*}
+    \begin{equation*}
+        \int_{\gamma_0} \frac{f(w)}{w - z}dw + \int_{\gamma_1} \frac{f(w)}{w - z}dw = \underset{n = 0}{\overset{\infty}{\sum}} \frac{f(w)}{(w - a)^{n+1}}(z - a)^n + \underset{n = -\infty}{\overset{-1}{\sum}} f(w) (w - a)^{n+1} (z - a)^n
+    \end{equation*}
+\end{proof}
+
+\begin{remark}
+    $G = B \backslash \{a\}$, $f$ голоморфна в $G$. Тогда говорится, что у $f$ в точке $a$ \textit{особенность}. Особенности бывают трёх типов:
+    \begin{enumerate}
+        \item Устранимая особенность: $f$ ограничена в окрестности $a$.
+        \item Полюс: $|f(z)| \to +\infty$ при $z \to a$.
+        \item Существенная особенность: $\lim_{z \to a} |f(z)|$ не существует.
+    \end{enumerate}
+\end{remark}
+
+\begin{proposition}
+    $G = B \backslash \{a\}$, $f$ голоморфна в $G$. Тогда
+    \begin{enumerate}
+        \item 
+    \end{enumerate}
+\end{proposition}
+
+\end{document}
