@@ -41,6 +41,8 @@
 \newcommand{\id}{\operatorname{id}}
 \newcommand{\Aut}{\operatorname{Aut}}
 \newcommand{\End}{\operatorname{End}}
+\newcommand{\Res}{\operatorname{Res}}
+\renewcommand{\ind}{\operatorname{ind}}
 \newcommand{\inter}{\cap}
 \newcommand{\union}{\cup}
 \newcommand{\Ra}{\Rightarrow}
@@ -376,7 +378,21 @@
 \end{proof}
 
 \begin{remark}
-    \todo{Подставляем ряд в интеграл}, используем единственность ряда Тейлора, и получаем что доказали теорему \ref{analit_holom}.
+    % \todo{Подставляем ряд в интеграл}, используем единственность ряда Тейлора, и получаем что доказали теорему \ref{analit_holom}.
+    \begin{align*}
+        \frac{1}{w - z} = \underset{n = 0}{\overset{+\infty}{\sum}} \frac{(z - a)^n}{(w - a)^{n+1}} \Ra f(z) = \underset{n = 0}{\overset{+\infty}{\sum}} \frac{1}{2 \pi i} \left(\int_{S_r} \frac{f(w)}{(w - a)^{n+1}} dw\right) (z - a)^n = \underset{n = 0}{\overset{+\infty}{\sum}} c_n (z - a)^n
+    \end{align*}
+
+    Получили разложение $f$ в степенной ряд, значит, $f$ --- аналитическая, и теорема \ref{analit_holom} доказана.
+\end{remark}
+
+\begin{remark}
+    Более того, мы получили явное выражение для $c_n$, которым далее будем пользоваться:
+    \begin{equation*}
+        c_n = \frac{1}{2 \pi i} \left(\int_{S_r} \frac{f(w)}{(w - a)^{n+1}} dw\right)
+    \end{equation*}
+
+    Вообще говоря, \todo{эта формула выполняется} и при $n < 0$ для неаналитических функций $f$.
 \end{remark}
 
 \begin{remark}
@@ -560,20 +576,86 @@
     \end{equation*}
 \end{proof}
 
-\begin{remark}
-    $G = B \backslash \{a\}$, $f$ голоморфна в $G$. Тогда говорится, что у $f$ в точке $a$ \textit{особенность}. Особенности бывают трёх типов:
+\begin{definition}[Особенность]
+    $G = B_r(a) \backslash \{a\}$, $f$ голоморфна в $G$. Тогда говорится, что у $f$ в точке $a$ \textit{особенность}. Особенности бывают трёх типов:
     \begin{enumerate}
         \item Устранимая особенность: $f$ ограничена в окрестности $a$.
         \item Полюс: $|f(z)| \to +\infty$ при $z \to a$.
         \item Существенная особенность: $\lim_{z \to a} |f(z)|$ не существует.
     \end{enumerate}
+\end{definition}
+
+\begin{remark}
+    Видно, что это исчерпывающая классификация. \todo{Приведём примеры} функций с особенностями каждого из типов:
 \end{remark}
 
 \begin{proposition}
-    $G = B \backslash \{a\}$, $f$ голоморфна в $G$. Тогда
+    $G = B_r(a) \backslash \{a\}$, $f$ аналитична в $G$. Тогда
     \begin{enumerate}
-        \item 
+        \item в точке $a$ у $f$ устранимая особенность $\iff$ в разложении $f$ главная часть $\equiv 0$.
+        \item в точке $a$ у $f$ полюс $\iff$ в главной части разложения $f$ количество ненулевых коэффициентов больше нуля и конечно.
+        \item в точке $a$ у $f$ существенная особенность $\iff$ в главной части разложения $f$ ненулевых коэффициентов бесконечно много.
     \end{enumerate}
 \end{proposition}
+\begin{proof}
+    \begin{enumerate}
+        \item В точке $a$ у $f$ устранимая особенность $\iff$ (по лемме \ref{noness}) $f$ аналитична в окрестности $a$ $\iff$ $f = \sum c_n (z - a)^n$ $\iff$ главная часть $\equiv 0$.
+        \item $\Ra$: Пусть в точке $a$ у $f$ полюс. Рассмотрим функцию $\frac{1}{f(z)}$, $f$ непрерывна и $|f(z)| \to +\infty$ при $z \to a$, значит, $|f|$ отделено 0 в некоторой окрестности $a$, значит $\frac{1}{f}$ определена и ограничена в этой окрестности. Тогда у $\frac{1}{f}$ в точке $a$ устранимая особенность, и тогда, по пункту $(1)$, \begin{gather*}
+            \frac{1}{f(z)} = \underset{n=0}{\overset{+\infty}{\sum}} d_n (z - a)^n = c_{d^*} (z - a)^{d^*} + \underset{n > d^*}{\sum} d_n (z - a)^n \Ra \\ 
+            \Ra \left| \frac{1}{f(z)} \right| = (c_{d^*} + \underline{o}(1)) |z - a|^{d^*} \Ra |f(z)| \leq C|z - a|^{-d^*}
+        \end{gather*}
+        Воспользуемся известной формулой для коэффициентов $c_n$ в разложении $f$ и оценим их по модулю:
+        \begin{align*}
+            |c_n| &\leq \left|\frac{1}{2 \pi i} \int_{S_{\varepsilon}} \frac{f(w)}{(w - a)^{n+1}} dw \right| \\
+            &\leq \frac{1}{2 \pi} \left|\int_{0}^{2 \pi} f(a + \varepsilon e^{it}) (\varepsilon e^{it})^{-n-1} \cdot \varepsilon i e^{it} dt\right| \\
+            &\leq \frac{1}{2 \pi} \int_{0}^{2 \pi} |f(a + \varepsilon e^{it})| \varepsilon^{-n} dt \\
+            &\leq \frac{1}{2 \pi} \int_{0}^{2 \pi} C |\varepsilon e^{it}|^{-d^*} \varepsilon^{-n} dt \\
+            &\leq \frac{C}{2 \pi} \int_{0}^{2 \pi} \varepsilon^{-d^* - n} dt \\
+            &\leq C \varepsilon^{-d^* - n} \underset{\varepsilon \to 0}{\longrightarrow} 0 \text{ при } n < d^*
+        \end{align*}
+
+        Поскольку формула для $c_n$ верна при любом $\varepsilon$, получаем, что при $n < d^*$ $c_n = 0$. Значит, количество ненулевых коэффициентов в главной части разложения $f$ не больше чем $d^*$.
+
+        $\La$: \todo{Очевидно}.
+        \item Поскольку классификация особенностей исчерпывающая, и была доказана эквивалентность в пунктах $(1)$ и $(2)$, эквивалентность для пункта (3) выполнена автоматически.
+    \end{enumerate}
+\end{proof}
+
+\begin{definition}[Кратность полюса]
+    Если $f$ имеет в точке $a$ полюс, $N = \max\{n \,|\, c_{-n} \neq 0\}$ называется \textit{кратностью полюса}.
+\end{definition}
+
+\begin{proposition}
+    Кратность полюса $f$ равна кратности нуля $\frac{1}{f}$.
+\end{proposition}
+
+\begin{definition}[Мероморфная функция]
+    $f$ голоморфна в $G$. $f$ называется \textit{мероморфной} в $G$, если множество полюсов $f$ в $G$ состоит только из изолированных точек.
+\end{definition}
+
+\begin{definition}[Вычет]
+    Если $f = \sum c_n (z - a)^n$, то \textit{вычетом} $f$ в точке $a$ называется $c_{-1}$. Вычет обозначается как $\Res_a f$.
+\end{definition}
+
+\begin{lemma}
+    \todo{Про обход полюса и вычет}
+    \begin{equation*}
+        \int_{S_{\varepsilon}} f(w)dw = 2 \pi i \cdot \Res_a f
+    \end{equation*}
+\end{lemma}
+
+\begin{theorem}[о вычетах]
+    $f$ аналитична в $G \backslash \{a_1, \dots, a_n\}$. $\gamma$ --- замкнутый путь в $G$, причем для $\forall k (\ind_{a_k}(\gamma) = 1)$. Тогда
+    \begin{equation*}
+        \int_{\gamma} f(z)dz = 2 \pi i \underset{k = 1}{\overset{n}{\sum}} \Res_{a_k} f
+    \end{equation*}
+\end{theorem}
+\begin{proof}
+    \todo{Гомотопия + лемма}
+\end{proof}
+
+\begin{remark}
+    \todo{Пример} про вычисление $\int_{\R} \frac{\cos x}{1 + x^2} dx$ через комплексные интегралы.
+\end{remark}
 
 \end{document}
