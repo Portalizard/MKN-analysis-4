@@ -49,6 +49,7 @@
 \newcommand{\La}{\Leftarrow}
 \renewcommand{\iff}{\Leftrightarrow}
 \newcommand{\todo}[1]{\colorbox{red}{#1}}
+\newcommand{\bsum}[2]{\underset{#1}{\overset{#2}{\sum}}}
 
 \newcounter{cnt}
 
@@ -158,7 +159,7 @@
 
 \begin{proposition}
 \label{4eqiuv}
-    \todo{Следующие утверждения эквивалентны}:
+    $f$ определена в открытом круге. Тогда в этом круге следующие утверждения эквивалентны:
     \begin{enumerate}
         \item $\int_{\gamma} f(z)dz$ зависит только от $\gamma(0), \gamma(1)$.
         \item Если $\gamma$ - замкнутый путь, то $\int_{\gamma} f(z)dz = 0$.
@@ -514,7 +515,7 @@
     $f$ голоморфна в $G$, $\gamma_0 \sim \gamma_1 \Ra \int_{\gamma_0} f(z)dz = \int_{\gamma_1} f(z)dz$.
 \end{theorem}
 \begin{proof}
-    $H([a, b] \times [0, 1])$ --- компакт. Выберем у него конечное покрытие $B_1, \dots, B_N \subset G$. \todo{По лемме Лебега} для достаточно малого $\varepsilon > 0$ образ при $H$ любого прямоугольника со сторонами меньше $\varepsilon$ целиком попадает в какой-нибудь $B_l$.
+    $H([a, b] \times [0, 1])$ --- компакт. Выберем у него конечное покрытие $B_1, \dots, B_N \subset G$. По лемме Лебега для достаточно малого $\varepsilon > 0$ образ при $H$ любого прямоугольника со сторонами меньше $\varepsilon$ целиком попадает в какой-нибудь $B_l$.
 
     Разобьём $[a, b] \times [0, 1]$ на такие прямоугольники $\Delta_{jk}$, $1 \leq j \leq m$, $1 \leq k \leq n$.
 
@@ -586,7 +587,12 @@
 \end{definition}
 
 \begin{remark}
-    Видно, что это исчерпывающая классификация. \todo{Приведём примеры} функций с особенностями каждого из типов:
+    Видно, что это исчерпывающая классификация. Приведём примеры функций, аналитичных в $B_1(0) \backslash \{0\}$, с особенностями каждого из типов:
+    \begin{enumerate}
+        \item $f(z) = z^3$. $|f(z)| = |z^3| = |z|^3 < 1$ в $B_1(0) \backslash \{0\}$.
+        \item $f(z) = \frac{1}{z^2}$. $|f(z)| = \frac{1}{|z|^2} \to +\infty$ при $z \to 0$.
+        \item $f(z) = e^{1/z}$. $|f(x + 0i)| = e^{1/x} \to +\infty$ при $x \to 0$. При этом $|f(0 + iy)| = |e^{-iy}| = 1$. Таким образом, $|f(z)|$ не имеет предела при $z \to 0$.
+    \end{enumerate}
 \end{remark}
 
 \begin{proposition}
@@ -616,7 +622,9 @@
 
         Поскольку формула для $c_n$ верна при любом $\varepsilon$, получаем, что при $n < d^*$ $c_n = 0$. Значит, количество ненулевых коэффициентов в главной части разложения $f$ не больше чем $d^*$.
 
-        $\La$: \todo{Очевидно}.
+        $\La$: \begin{equation*}
+            f(z) = \bsum{n = -N}{-1} c_n (z - a)^n + \bsum{n = 0}{+\infty} c_n (z - a)^n \Ra |f(z)| \underset{z \to a}{\longrightarrow} +\infty
+        \end{equation*}
         \item Поскольку классификация особенностей исчерпывающая, и была доказана эквивалентность в пунктах $(1)$ и $(2)$, эквивалентность для пункта (3) выполнена автоматически.
     \end{enumerate}
 \end{proof}
