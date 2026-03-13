@@ -21,10 +21,27 @@
 % \tikzexternalize[prefix=tikz/]
 % \tikzexternaldisable
 % \usepackage{xcolor}
+\usepackage{mathabx}
 \usepackage{tikz}
 \usetikzlibrary {arrows.meta}
 \usetikzlibrary {decorations.pathmorphing}
 \usetikzlibrary {decorations.markings}
+\usetikzlibrary{bending}
+
+\tikzset{
+    pics/cross/.style ={
+        code = {
+            \draw (-2pt,-2pt) -- (2pt,2pt) (-2pt,2pt) -- (2pt,-2pt);
+        }
+    },
+    pics/atp/.style={
+        code = {
+            \draw (-2pt,-2pt) -- (2pt,2pt) (-2pt,2pt) -- (2pt,-2pt);
+            \draw[-{Stealth[length=7pt, bend]}] (0,0.2) arc[start angle=90, end angle=270, radius=0.2cm];
+            \draw[-{Stealth[length=7pt, bend]}] (0,-0.2) arc[start angle=-90, end angle=90, radius=0.2cm];
+        }
+    }
+}
 
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\R}{\mathbb{R}}
@@ -36,12 +53,15 @@
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\D}{\mathbb{D}}
 \newcommand{\vol}{\operatorname{vol}}
+\newcommand{\Int}{\operatorname{Int}}
 \newcommand{\Fr}{\operatorname{Fr}}
 \newcommand{\Gal}{\operatorname{Gal}}
 \newcommand{\id}{\operatorname{id}}
 \newcommand{\Aut}{\operatorname{Aut}}
 \newcommand{\End}{\operatorname{End}}
 \newcommand{\Res}{\operatorname{Res}}
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
 \renewcommand{\ind}{\operatorname{ind}}
 \newcommand{\inter}{\cap}
 \newcommand{\union}{\cup}
@@ -49,7 +69,7 @@
 \newcommand{\La}{\Leftarrow}
 \renewcommand{\iff}{\Leftrightarrow}
 \newcommand{\todo}[1]{\colorbox{red}{#1}}
-\newcommand{\bsum}[2]{\underset{#1}{\overset{#2}{\sum}}}
+% \newcommand{\bsum}[2]{\underset{#1}{\overset{#2}{\sum}}}
 
 \newcounter{cnt}
 
@@ -430,7 +450,8 @@
 \end{remark}
 
 \begin{proposition}[Принцип максимума]
-    $G$ --- ограниченная область, $f$ аналитична в $\overline{G}$.\\ Тогда $\underset{z \in \overline{G}}{\max} |f(z)| = \underset{z \in \partial G}{\max} |f(z)|$.
+\label{prmax}
+    $G$ --- ограниченная область, $f$ аналитична в $\overline{G}$. Тогда $\underset{z \in \overline{G}}{\max} |f(z)| = \underset{z \in \partial G}{\max} |f(z)|$.
 \end{proposition}
 \begin{proof}
     Неравенство $\underset{z \in \overline{G}}{\max} |f(z)| \geq \underset{z \in \partial G}{\max} |f(z)|$ очевидно. $\underset{z \in \overline{G}}{\max} |f(z)|$ достигается, так как $\overline{G}$ замкнута и ограничена, следовательно, компактна. Пусть он достигается в точке $z_0 \notin \partial G$. Тогда $dist(z_0, \partial G) = r > 0$, и $(B_r(z_0) \subset G)$. Если $\underset{z \in \overline{G}}{\max} |f(z)| > \underset{z \in \partial G}{\max} |f(z)|$, то \todo{по непрерывности} $f(z_0) > \int_0^{2\pi} f(z_0 + re^{it})dt$, что противоречит $(\star)$.
@@ -554,12 +575,24 @@
     $\gamma_0 = \partial B_{R - \varepsilon}(a)$, $\gamma_1 = - \partial B_{r + \varepsilon}(a)$ (обход окружности в обратном направлении, то есть по часовой стрелке), $\gamma_+ = [a + r + \varepsilon, a + R - \varepsilon]$, $\gamma_- = - \gamma_+$.
 
     \begin{center}
-    \begin{tikzpicture}
-        
+    \begin{tikzpicture}[scale=1.5]
+        \draw[dashed] (0,0) circle [radius=3cm];
+        \draw[dashed] (0,0) circle [radius=1cm];
+        \draw (-2.2,2.2) node[above left]{$A_{r,R}$};
+        \draw[fill] (0,0) node[below right]{$a$} circle [radius=1pt];
+        \draw[fill] (1.5,-1.5) node[below right]{$z$} circle [radius=1pt];
+        \begin{scope}[arrows = {- Stealth[length=10pt]}]
+            \draw (0,2.8) node[below]{$\gamma_0$} arc [start angle=90, end angle=270, radius=2.8cm];
+            \draw (0,-2.8) arc [start angle=-90, end angle=90, radius=2.8cm];
+            \draw (0,-1.2) arc [start angle=-90, end angle=-270, radius=1.2cm];
+            \draw (0,1.2) node[above]{$\gamma_1$} arc [start angle=90, end angle=-90, radius=1.2cm];
+        \end{scope}
+        \draw[{Stealth[length=10pt,harpoon]}-{Stealth[length=10pt,harpoon]}] 
+            (1.2,0) -- node[above right]{$\gamma_+$} node[below left]{$\gamma_-$} (2.8,0);
     \end{tikzpicture}
     \end{center}
 
-    Обозначим $\gamma = \gamma_0 \union \gamma_1 \union \gamma_+ \union \gamma_-$. $\gamma \sim 0$, $f$ аналитична, значит, $\int_{\gamma} f(z)dz = 0$. Тогда $\int_{\gamma} \frac{f(z) - f(w)}{z - w}dw = 0$. В $A_{r, R}$ выполнена формула Коши, потому что $\gamma \sim \partial B_{\varepsilon}(z)$.
+    Обозначим $\gamma = \gamma_0 \union \gamma_1 \union \gamma_+ \union \gamma_-$. Видно, что $\gamma \sim 0$, $f$ аналитична, значит, $\int_{\gamma} f(z)dz = 0$. Тогда $\int_{\gamma} \frac{f(z) - f(w)}{z - w}dw = 0$. В $A_{r, R}$ выполнена формула Коши, потому что $\gamma \sim \partial B_{\varepsilon}(z)$.
     \begin{equation*}
         \int_{\gamma} \frac{f(w)}{w - z} dw = 0
     \end{equation*}
@@ -623,7 +656,7 @@
         Поскольку формула для $c_n$ верна при любом $\varepsilon$, получаем, что при $n < d^*$ $c_n = 0$. Значит, количество ненулевых коэффициентов в главной части разложения $f$ не больше чем $d^*$.
 
         $\La$: \begin{equation*}
-            f(z) = \bsum{n = -N}{-1} c_n (z - a)^n + \bsum{n = 0}{+\infty} c_n (z - a)^n \Ra |f(z)| \underset{z \to a}{\longrightarrow} +\infty
+            f(z) = \sum_{n = -N}^{-1} c_n (z - a)^n + \sum_{n = 0}^{+\infty} c_n (z - a)^n \Ra |f(z)| \underset{z \to a}{\longrightarrow} +\infty
         \end{equation*}
         \item Поскольку классификация особенностей исчерпывающая, и была доказана эквивалентность в пунктах $(1)$ и $(2)$, эквивалентность для пункта (3) выполнена автоматически.
     \end{enumerate}
@@ -652,7 +685,8 @@
     \end{equation*}
 \end{lemma}
 
-\begin{theorem}[о вычетах]
+\begin{theorem}[О вычетах]
+\label{res}
     $f$ аналитична в $G \backslash \{a_1, \dots, a_n\}$. $\gamma$ --- замкнутый путь в $G$, причем для $\forall k (\ind_{a_k}(\gamma) = 1)$. Тогда
     \begin{equation*}
         \int_{\gamma} f(z)dz = 2 \pi i \underset{k = 1}{\overset{n}{\sum}} \Res_{a_k} f
@@ -660,10 +694,343 @@
 \end{theorem}
 \begin{proof}
     \todo{Гомотопия + лемма}
+
+    \begin{center}
+    \begin{tikzpicture}[scale=2, transform shape]
+        \draw (0,0) pic{atp};
+    \end{tikzpicture}
+    \end{center}
 \end{proof}
 
 \begin{remark}
-    \todo{Пример} про вычисление $\int_{\R} \frac{\cos x}{1 + x^2} dx$ через комплексные интегралы.
+    В качестве примера использования полученной теоремы вычислим $\int_\R \frac{\cos x}{1 + x^2} dx$.
+    \begin{gather*}
+        \int_\R \frac{\cos x}{1 + x^2} dx = \Re \left( \int_\R \frac{e^{ix}}{1 + x^2} dx \right) \\
+        \int_\R \frac{e^{ix}}{1 + x^2} = \lim_{R \to +\infty} \int_{-R}^{R} \frac{e^{ix}}{1 + x^2}
+    \end{gather*}
+    Функция $\frac{e^{iz}}{1 + z^2}$ аналитична в $\C \backslash \{i, -i\}$. Для применения теоремы \ref{res} замкнём контур верхней полуокружностью радиуса $R$, обозначим эту дугу $\gamma_+$. Обозначим получившийся контур $\gamma_R$.
+
+    % \begin{center}
+    % \begin{tikzpicture}
+    %     \draw (-3,0) node[below]{$-R$} (0,0) -- (3, 0) node[below]{$R$};
+    %     \draw[-{Stealth}] (-3,0) -- (0,0);
+    %     \draw (0,1) node[below right]{$i$} pic{cross};
+    %     \draw[-{Stealth}] (3,0) arc[start angle=0, end angle=90, radius=3];
+    % \end{tikzpicture}
+    % \end{center}
+
+    По теореме \ref{res}
+    \begin{gather*}
+        \frac{e^{iz}}{1 + z^2} = \frac{1}{z - i} \frac{e^{iz}}{z + i} \Ra c_{-1} = \frac{e^{-1}}{2i} \Ra \\
+        \Ra \int_\gamma \frac{e^{iz}}{1 + z^2} dz = 2 \pi i \Res_i f = \frac{\pi}{e}
+    \end{gather*}
+    Заметим, что
+    \begin{equation*}
+        \left| \int_{\gamma_+} \frac{e^{iz}}{1 + z^2} dz \right| \leq \frac{1}{R^2 - 1} \cdot \pi R \underset{R \to +\infty}{\longrightarrow} 0
+    \end{equation*}
+    Поскольку для любого $R$ $\int_{\gamma_R} = \int_{-R}^{R} + \int_{\gamma_+}$, при устремлении $R \to +\infty$ получаем что $\int_\R = \frac{\pi}{e}$.
 \end{remark}
+
+\begin{remark}
+    Вычислим ещё один интеграл: $\int_\R \frac{\sin x}{x} dx$. Из прошлых семестров мы уже знаем, что он равен $\pi$ --- получим этот результат методами комплексного анализа.
+
+    $\frac{\sin z}{z} = \frac{e^{iz} - e^{-iz}}{2iz}$ --- целая функция. Хотим замкнуть контур, но в точке $z = 0$ функция $\frac{e^{iz}}{z}$ не суммируема, поэтому будем интегрировать по $[-R, -\varepsilon] \union [\varepsilon, R]$, устремляя $R \to +\infty, \varepsilon \to 0$. Такую пару отрезков можно замкнуть половиной кольца $A_{\varepsilon, R}$. Назовём полученный контур $\gamma_{\varepsilon, R}$, верхнюю полуокружность $c_R^+$, нижнюю $c_\varepsilon^+$.
+
+    % \begin{center}
+    % \begin{tikzpicture}
+        
+    % \end{tikzpicture}
+    % \end{center}
+
+    \begin{equation*}
+        \int_\R \frac{\sin x}{x} dx = \lim_{\substack{\varepsilon \to 0 \\ R \to +\infty}} \int_{\varepsilon < |x| < R} \frac{\sin x}{x} dx = \lim_{\substack{\varepsilon \to 0 \\ R \to +\infty}} \frac{1}{i} \int_{\varepsilon < |x| < R} \frac{e^{ix}}{x} dx
+    \end{equation*}
+    \begin{equation*}
+        \int_{\gamma_{\varepsilon, R}} \frac{e^{iz}}{z} dz = 0 = \int_{[\hdots] \union [\hdots]} + \int_{c_\varepsilon^+} + \int_{c_R^+}
+    \end{equation*}
+    Для вычисления искомого интеграла вычислим интегралы по полуокружностям. Рассмотрим полуокружность радиуса $R$. Заделим её на три части: $\arg \in [0, \frac{1}{\sqrt{R}}]$, $\arg \in (\frac{1}{\sqrt{R}}, \pi - \frac{1}{\sqrt{R}})$, $\arg \in [\pi - \frac{1}{\sqrt{R}}, \pi]$. В первой и третьей частях значение подынтегральной функции по модулю $\leq 1$, но сами части малы; вторая же часть большая, но значение подынтегральной функции на ней можно оценить лучше:
+    \begin{gather*}
+        \int_{c_R^+} \frac{e^{iz}}{z} dz = \int_{0}^{\pi} \frac{e^{i(Re^{it})}}{Re^{it}} d(Re^{it}) = \int_{0}^{\pi} e^{-R \sin(t)} \cdot e^{iR \cos(t)} dt = \int_{0}^{\frac{1}{\sqrt{R}}} + \int_{\frac{1}{\sqrt{R}}}^{\pi - \frac{1}{\sqrt{R}}} + \int_{\pi - \frac{1}{\sqrt{R}}}^{\pi}
+    \end{gather*}
+    В первом и третьем интегралах подынтегральная функция по модулю $<1$, а во втором второй множитель на модуль не влияет.
+    \begin{equation*}
+        \int_{0}^{\frac{1}{\sqrt{R}}} + \int_{\frac{1}{\sqrt{R}}}^{\pi - \frac{1}{\sqrt{R}}} + \int_{\pi - \frac{1}{\sqrt{R}}}^{\pi} \leq \frac{1}{\sqrt{R}} + \left(\pi - 2 \frac{1}{\sqrt{R}}\right) \cdot e^{-R \sin(t)} + \frac{1}{\sqrt{R}} \underset{R \to +\infty}{\longrightarrow} 0
+    \end{equation*}
+
+    Теперь рассмотрим интеграл по второй полуокружности, $c_\varepsilon^+$.
+    \begin{equation*}
+        \int_{c_\varepsilon^+} \frac{e^{iz}}{z} dz = \int_{c_\varepsilon^+} \frac{dz}{z} + \int_{c_\varepsilon^+} \frac{e^{iz} - 1}{z} dz
+    \end{equation*}
+    В окрестности 0 $\frac{e^{iz} - 1}{z}$ ограничена. Поскольку при $\varepsilon \to 0$ длина $c_\varepsilon^+ \to 0$, это означает, что второй интеграл в этой сумме $\to 0$ при $\varepsilon \to 0$.
+    \begin{equation*}
+        \int_{c_\varepsilon^+} \frac{dz}{z} = \int_{\pi}^{0} \frac{d(\varepsilon e^{it})}{\varepsilon e^{it}} = - \pi i
+    \end{equation*}
+
+    Таким образом
+    \begin{gather*}
+        i \int_\R \frac{\sin x}{x} dx = \lim_{\substack{\varepsilon \to 0 \\ R \to +\infty}} \int_{[\hdots] \union [\hdots]} \frac{e^{iz}}{z} dz = \pi i \Ra \\
+        \Ra \int_\R \frac{\sin x}{x} dx = \pi
+    \end{gather*}
+\end{remark}
+
+\begin{remark}
+    Как мы знаем,
+    \begin{equation*}
+        f(z) = \frac{1}{2 \pi i} \int_{\partial D} \frac{f(w)}{w - z} dw = \begin{cases}
+            0, w \notin D \\ f(z) \in \Int(D)
+        \end{cases}
+    \end{equation*}
+    В глаза бросается факт, что случай $w \in \partial D$ остался нерассмотренным. Оказывается, что можно ввысти понятие \textit{полувычета}, и такой интеграл будет равен $\frac{f(z)}{2}$.
+\end{remark}
+
+\begin{remark}
+    Пусть $f$ аналитична в проколотой окрестности $\dot{U}_a$ точки $a$, а в самой точке $a$ имеет существенную особенность. Следующие две теоремы рассматривают то, какие значения может принимать $f$ на $\dot{U}_a$.
+\end{remark}
+
+\begin{theorem}[Пикара]
+    $f(\dot{U}_a)$ есть всё $\C$, возможно без одной точки.
+\end{theorem}
+
+\begin{theorem}[Пикара]
+    Пусть $f$ не аналитична, а мероморфна. Тогда $f(\dot{U}_a)$ есть всё $\hat{\C} = \C \union \{\infty\}$, возможно без одной или двух точек.
+\end{theorem}
+
+\begin{remark}
+    Эти теоремы сложные, поэтому даны без доказательства. Есть более слабая, но и намного более простая теорема схожего характера.
+\end{remark}
+
+\begin{theorem}[Сохоцкого]
+    $f$ мероморфна в $\dot{U}_a$, и имеет существенную особенность в $a$. Тогда $f(\dot{U}_a)$ всюду плотно в $\C$.
+\end{theorem}
+\begin{proof}
+    Предположим противное, то есть $\exists B_r(\xi) \subset \C \backslash f(\dot{U}_a)$. Рассмотрим функцию $h(z) = \frac{1}{f(z) - \xi}$. Она ограничена и аналитична в $\dot{U}_a$, а значит, по лемме \ref{noness}, аналитична в $U_a$. Однако $f(z) = \frac{1}{h(z)} + \xi$, и если $h(z)$ аналитична в $U_a$, то $f(a)$ можно однозначно определить (если $h(a) = 0$, то значение получится равным $\infty$). Это противоречит тому, что в точке $a$ у $f$ была существенная особенность.
+\end{proof}
+
+\begin{remark}
+    Пусть $f$ аналитична в области $G$. Попытаемся определить $\log(f(z))$ в $G$ --- вообще говоря, $\log$ функция не однозначная, потому что $\exp(\log(f(z)) + 2 i \pi k) = \exp(\log(f(z)))$. Тем не менее, можно определить $\log$ в области через фиксированное значение в точке и непрерывность. Для этого потребуем, что $f(z) \neq 0$ в $G$, и что $G$ односвязна. Если бы мы смогли задать $\log(f(z))$, то его производной должна была бы быть функция $\frac{f'(z)}{f(z)}$. Исходя из этого, зафиксируем точку $z_0 \in G$, и определим
+    \begin{equation*}
+        H(z) = \int_{z_0}^{z} \frac{f'(z)}{f(z)} dz
+    \end{equation*}
+    $H(z)$ определена корректно, ведь поскольку $f$ аналитична и $G$ односвязна, интегралы по разным путям из $z_0$ в $z$ совпадают. Покажем, что $H(z)$ почти является логарифмом:
+    \begin{equation*}
+        \left( \frac{e^{H(z)}}{f(z)} \right)' = \frac{e^{H(z)} H'(z) f(z) - e^{H(z)} f'(z)}{f(z)^2} = \frac{e^{H(z)} \frac{f'(z)}{f(z)} f(z) - e^{H(z)} f'(z)}{f(z)^2} = 0 \Ra e^{H(z)} = const \cdot f(z)
+    \end{equation*}
+    Заменив $H(z)$ на $H(z) + c$, можно получить $e^{H(z)} = f(z)$. Заметим, что любая другая функция с таким свойством отличается прибавленим $2 i \pi k$:
+    \begin{equation*}
+        \begin{cases}
+            e^{H_1(z)} = f(z) \\ e^{H_2(z)} = f(z)
+        \end{cases} \Ra e^{H_1(z) - H_2(z)} = 2 i \pi k
+    \end{equation*}
+    При этом $k$ не может меняться для фиксиованной пары функций $(H_1, H_2)$, потому что равенство выполнено при любом $z$ и $H_1 - H_2$ --- непрерывная функция.
+\end{remark}
+
+\begin{remark}
+    Определив логарифм, можно определить и возведение комплексного числа в комплексную степень: $z^\beta = e^{\beta \log(z)}$.
+\end{remark}
+
+\begin{remark}
+    Подумаем о "<физическом смысле"> $\int_{z_0}^{z} H(w) dw = \log(z) - \log(z_0)$. Пусть $f$ аналитична в $G$, $\{z_k\}$ --- нули $f$, $\gamma \subset G$ - путь не проходящий через $z_k$, и $\forall k (\ind_{z_k}(\gamma) = 1)$.
+
+    Рассмотрим интеграл $\int_\gamma H(w) dw$. Отметим две близкие точки $a, b$ на контуре $\gamma$ следующим образом:
+
+    % \begin{center}
+    % \begin{tikzpicture}
+        
+    % \end{tikzpicture}
+    % \end{center}
+
+    Обозначим часть $\gamma$ от $a$ до $b$ ("<от"> и "<до"> понимаются в смысле обхода $\gamma$ в правильном направлении, то есть эта часть будет почти всем контуром) как $\gamma_{ab}$. Достаточно малая окрестность $\gamma_{ab}$ не содержит нулей $f$ и односвязна, значит в ней можно определить $\log(f(z))$ как интеграл $\int_{a}^{z} H(w) dw$. Интеграл по части контура $\gamma_{ab}$ равен $\log(f(b)) - \log(f(a))$. 
+    
+    Отметим, что если $f(z) = r e^{i \varphi}$, то $\log(f(z)) = \log(r) + i \varphi$. Заметим, что после обхода $\gamma$ $\arg f(z) = \varphi$ мог измениться на $2 i \pi k$. Обозначим это изменение $\Delta_{\arg f(z)}$.   
+    
+    Устремив точку $b$ к $a$, получим, что $\int_\gamma H(w) dw = i \Delta_{\arg f(z)}$.
+
+    Заметим, что $\gamma$ гомотопно объединению обходов нулей:
+
+    % \begin{center}
+    % \begin{tikzpicture}
+        
+    % \end{tikzpicture}
+    % \end{center}
+
+    Теперь распишем интеграл $\int_\gamma H(w) dw = \int_\gamma \frac{f'(w)}{f(w)} dw$ на окружности малого радиуса вокруг $z_k$.
+    \begin{gather*}
+        f(z) = \sum_{l = 0}^{+\infty} c_l (z - z_k)^l = c_{l^*} (z - z_k)^{l^*} + \sum_{l > l^*} c_l (z - z_k)^l, \quad f(z_k) = 0 \Ra l^* \geq 1  \\
+        f'(z) = l^* c_{l^*} (z - z_k)^{l^* - 1} + \sum_{l > l^*} l c_l (z - z_k)^{l - 1} \\
+        \frac{f'(z)}{f(z)} = \frac{l^* c_{l^*} (z - z_k)^{l^* - 1} + (z - z_k)^{l^*} \left(\sum_{l > l^*} l c_l (z - z_k)^{l - 1 - l^*} \right)}{c_{l^*} (z - z_k)^{l^*} \left(1 + (z - z_k) \sum_{l > l^*} c_l c_{l^*}^{-1} (z - z_k)^{l - l^* - 1} \right)} = \\
+        = \frac{l^* c_{l^*} + (z - z_k) \varphi(z)}{c_{l^*} (z - z_k) (1 + (z - z_k)\psi(z))} = \frac{l^*}{(z - z_k) (1 + (z - z_k)\psi(z))} + \frac{\varphi(z)}{c_{l^*} (1 + (z - z_k)\psi(z))}
+    \end{gather*}
+    Вторая дробь есть частное двух аналитических фунций, причём знаменатель не обращается в 0 по непрерывности (т.к. $z$  лежит на окружности малого радиуса вокруг $z_k$). Значит, вторая дробь --- аналитическая функция.
+    \begin{gather*}
+        \frac{l^*}{(z - z_k) (1 + (z - z_k) \psi(z))} = \frac{l^*}{z - z_k} + \left( \frac{l^*}{(z - z_k)(1 + (z - z_k) \psi(z))} - \frac{l^*}{z - z_k} \right) = \\
+        = \frac{l^*}{z - z_k} + \frac{l^*(1 - 1 - (z - z_k) \psi(z))}{(z - z_k) (1 + (z - z_k)\psi(z))} = \frac{l^*}{z - z_k} + \frac{l^* \psi(z)}{1 + (z - z_k) \psi(z)}
+    \end{gather*}
+    Здесь, по аналогичным причинам, вторая дробь тоже является аналитической фунцией.
+
+    Итого, получаем
+    \begin{equation*}
+        \frac{f'(z)}{f(z)} = \frac{l^*}{z - z_k} + g(z)
+    \end{equation*}
+    где $g(z)$ аналитична на рассматриваемой окружности. Теперь можно вычислить
+    \begin{equation*}
+        \int_{\partial B_\varepsilon(z_k)} \frac{f'(w)}{f(w)} dw = \int_{\partial B_\varepsilon(z_k)} \frac{l^*}{z - z_k} + \int_{\partial B_\varepsilon(z_k)} g(w) dw = 2 i \pi \cdot l^* + 0 = 2 i \pi \cdot l^*
+    \end{equation*}
+    При этом $l^*$ есть в точности кратность корня $z_k$ у $f$. Тогда получаем
+    \begin{equation*}
+        \int_\gamma \frac{f'(w)}{f(w)} dw = \sum_k \int_{\partial B_\varepsilon(z_k)} \frac{f'(w)}{f(w)} dw = \sum_k 2 i \pi \cdot l_k^* = 2 i \pi \cdot n(f)
+    \end{equation*}
+    где $n(f)$ --- количество нулей $f$ с учётом кратности.
+
+    Используя оба полученных равенства, получаем утверждение:
+    \begin{equation*}
+        2 i \pi n(f) = \int_\gamma \frac{f'(w)}{f(w)} dw = i \Delta_{\arg f(z)}
+    \end{equation*}
+\end{remark}
+
+\begin{theorem}[Принцип аргумента]
+\label{prarg}
+    $\Delta_{\arg f(z)} = 2 \pi n(f)$.
+\end{theorem}
+
+\begin{remark}
+    Если считать $f$ не аналитической, а мероморфной, при этом $f(z) \neq 0, \infty$ на $\gamma$, то аналогично доказывается аналог этой теоремы для ммероморфных функций.
+\end{remark}
+
+\begin{theorem}[Принцип аргумента для мероморфной функции]
+    $\Delta_{\arg f(z)} = 2 \pi (n(f) - p(f))$, где $p(f)$ --- количество полюсов $f$ внутри $\gamma$.
+\end{theorem}
+
+\begin{remark}
+    Приведём несколько примеров использования принципа аргумента.
+
+    Пусть $P(z)$ --- полином степени $n$. Тогда при обходе по достаточно большой окружности $\Delta_{\arg P(z)} = 2 \pi n$. Значит, в достаточно большом круге у $P(z)$ ровно $\frac{2 \pi n}{2 \pi} = n$ нулей, что даёт основную теорему алгебры.
+
+    Пусть $f(z) = 2 z^3 + \frac{\sin z}{10} - 1 = 0$ в $B_1(0)$. Если $|z| < 1$, то $|\sin(z)| < e$. Тогда при обходе $\gamma = \partial B_{1 - \varepsilon}(0)$
+    \begin{equation*}
+        |2 z^3| > \left| \frac{\sin(z)}{10} - 1 \right| \Ra \Delta_{\arg f(z)} = 2 \pi \cdot 3
+    \end{equation*}
+    значит, $f(z)$ имеет ровно 3 корня в $B_1(0)$.
+\end{remark}
+
+\begin{theorem}[Руше]
+\label{rouche}
+    $G$ --- область, $\gamma \subset G$ --- простой путь, обходимый против часовой стрелки, $f, g$ --- аналитические в $G$, $|f(\xi)| > |g(\xi)|$ при $\xi \in gamma$. Тогда у $f$ и $f + g$ одинаковое число нулей внутри $\gamma$.
+\end{theorem}
+\begin{proof}
+    Обозначим за $N_f, N_{f + g}$ количество нулей внутри $\gamma$ у функций $f, f + g$ сооответственно. Из доказательства принципа аргумента знаем, что
+    \begin{gather*}
+        N_f = \frac{1}{2 i \pi} \int_\gamma \frac{f'(w)}{f(w)} dw, \quad N_{f + g} = \frac{1}{2 i \pi} \int_\gamma \frac{f'(w) + g'(w)}{f(w) + g(w)} dw \\
+        N_f - N_{f + g} = \frac{1}{2 i \pi} \int_\gamma \frac{f'g - g'f}{f (f + g)} dw = \frac{1}{2 i \pi} \int_\gamma \frac{\left(1 + \frac{g}{f}\right)'}{1 + \frac{g}{f}} dw = N_{1 + \frac{g}{f}}
+    \end{gather*}
+    Поскольку $|g(\xi)| < |f(\xi)|$, $\left|\frac{g}{f}\right| < 1$. Тогда все значения $\left(1 + \frac{g}{f}\right)(\xi)$ лежат справа от точки 0. Значит, $\ind_0 \left(1 + \frac{g}{f}\right) = 0 \Ra N_{1 + \frac{g}{f}} = \frac{1}{2 \pi} \Delta_{\arg f(z)} = 0$. 
+\end{proof}
+
+\begin{remark}
+    Приведём пример использования этой теоремы. Пусть $f(z) = z^3, g(z) = \frac{\sin z}{10} - \frac{1}{3}$, $\gamma = \partial B_1(0)$. Тогда $|f(\xi)| = 1 > \frac{e}{10} + \frac{1}{3} \geq |g(\xi)|$. При этом у $f$, очевидно, один корень в $B_1(0)$. Значит, и у функции $z^3 + \frac{\sin z}{10} - \frac{1}{3}$ ровно один корень в $B_1(0)$.
+\end{remark}
+
+\begin{definition}
+    $\hat{\C} = \C \union \{\infty\}$.
+\end{definition}
+
+\begin{remark}
+    Пусть $f$ мероморфна, $f: \hat{\C} \to \hat{\C}$. \todo{Хотим придать смысл} $f(\infty)$.
+    \begin{equation*}
+        f(z) = \sum_{n = -\infty}^{+\infty} \frac{c_n}{z^n} = \sum_{n \geq 1}^{+\infty} + \sum_{n = -\infty}^{0} = I + \sum_{n = -\infty}^{0}
+    \end{equation*}
+    
+    Если I нет, то $\lim_{z \to \infty} f(z) = c_0$.
+
+    Если количество слагаемых в I конечно, то $\lim_{z \to \infty} = \infty$.
+
+    Если же количество слагаемых в I бесконечно, то у $f$ в точке $\infty$ существенная особенность.
+
+    Сфера Римана.
+\end{remark}
+
+\begin{remark}
+    Пусть $f$ аналитична в $\hat{B}_R = \{ z \,|\, |z| > R\}$, т.е. в окрестности $\infty$. Сделаем в форме $f(z)dz$ замену переменной:
+    \begin{gather*}
+        w = \frac{1}{z} \Ra f\left(\frac{1}{w}\right) d\left(\frac{1}{w}\right) = - \frac{1}{w^2} f\left(\frac{1}{w}\right) dw \Ra \\ \Ra f(z) dz = \sum c_n z^n dz = - \sum c_n w^{-n-2} dw = \frac{- c_{-1}}{w} + (\hdots)
+    \end{gather*}
+    Таким образом, естественно считать $\Res_\infty f = - c_1$.
+\end{remark}
+
+\begin{theorem}
+    $f$ аналитична в $\hat{\C} \backslash \{a_1, \hdots, a_n\}$, где $a_i \in \hat{\C}$. Тогда $\sum_{i = 1}^{n} \Res_{a_k} f = 0$.
+\end{theorem}
+\begin{proof}
+    Рассморим контур $\gamma$, который обходит все особенности в $\C$ против часовой стрелки по одному разу. Сначала рассмотрим случай, когда $\infty$ --- не особая точка. Тогда
+    \begin{equation*}
+        2 i \pi \sum \Res_{a_k} f = \int_\gamma f(w) dw
+    \end{equation*}
+    Этот интеграл равен 0, так как $\gamma$ можно стянуть в точку через $\infty$. Значит, и сумма вычетов равна 0.
+
+    Если же $\infty$ является особой точкой, то $\gamma$ гомотопен обходу $\infty$ по часовой стрелке. Если обозначить за $\{b_i\}$ все $a_i$ кроме $\infty$, получим $\sum \Res_{b_k} f = c_{-1} = -\Res_\infty f$. Тогда $\sum \Res_{b_k} f + \Res_\infty f = \sum \Res_{a_k} f = 0$.
+\end{proof}
+
+\begin{remark}
+    Пусть $f$ аналитична в $G$. Рассмотрим её поведение в малой окрестности $U_a$ точки $a \in G$. Мы уже обсуждали несколько теорем о случае, когда $a$ --- существенная особенность. Теперь же обратимся к случаю, когда в точке $a$ нет особенностей.
+    \begin{equation*}
+        f(z) = f(a) + f'(a)(z - a) + g(z) \Ra f(z) - f(a) = f'(a)(z - a) + o(|z - a|), \quad g(z) = o(|z - a|)
+    \end{equation*}
+    Если $f'(a) \neq 0$, то в правой части первое слагаемое в малой окрестости $a$ по модулю больше второго, значит, по теореме \ref{rouche} для пары $(f'(a)(z - a), g(z))$ и $\gamma = \partial U_a$, у функции $f(z) - f(a)$ столько же нулей в $U_a$, сколько и у $f'(a)(z - a)$, то есть ровно 1. Таким образом, $f$ принимает значение $f(a)$ единожды в $U_a$. Это подводит нас к понятию однолистных функций.
+\end{remark}
+
+\begin{definition}[Однолистная функция]
+    Пусть $G$ --- обсласть, $f$ аналитична в $G$. $f$ называется \textit{однолистной} в $G$, если она биективна, то есть $\forall z_1, z_2 \in G (f(z_1) = f(z_2) \Ra z_1 = z_2)$.
+\end{definition}
+
+\begin{remark}
+    \todo{Преобразования Мёбиуса - автоморфизмы диска}
+\end{remark}
+
+% переделать выше: ref |-> название (ref)
+
+\begin{lemma}[Шварца]
+\label{lmsch}
+    $D = B_1(0)$, $f: D \to D$ аналитична в $D$, $f(0) = 0$. Тогда $|f(z)| \leq |z|$, и если найдётся $z_0$ такое, что $|f(z_0)| = |z_0|$, то $f$ --- поворот.
+\end{lemma}
+\begin{proof}
+    $f(z) = \sum_{n = 0}^{+\infty} c_n z^n$, $f(0) = c_0 = 0$, значит, $g(z) = \frac{f(z)}{z}$ аналитична в $D$. Рассмотрим $r < 1$. $|f(z)| < 1$, значит, при $|z| = r$ $|g(z)| < \frac{1}{r}$. По принципу максимума (\ref{prmax}) для $G = B_r(0)$ из этого следует что $|g(z)| < \frac{1}{r}$ и при $|z| \leq r$. Тогда $\forall z \in D (|g(z)| \leq 1)$. По определению $g(z)$ из этого следует $|f(z)| \leq |z|$.
+
+    Если нашлось $z_0$ такое, что $|f(z_0)| = |z_0|$, то $|g(z_0)| = 1$. Тогда по строгому принципу максимума $|g(z)| = 1$ на всём $D$. 
+\end{proof}
+
+\begin{proposition}
+    Пусть $f: D \to D$ --- аналитический автоморфизм $D$, и $f(0) = 0$. Тогда $f$ --- поворот.
+\end{proposition}
+\begin{proof}
+    $f$ --- автоморфизм, следовательно, и $f^{-1}$ --- автоморфизм. Также $f^{-1}(0) = 0$. Рассмотрим $z_0 \in D,\, z_0 \neq 0$. По лемме Шварца (\ref{lmsch}), $|z_0| \geq |f(z_0)|$. Но лемму Шварца можно применить и к $f^{-1}$, из чего вытекает $|f(z_0)| \geq |f^{-1}(f(z_0))| = |z_0|$. Таким образом $|z_0| \geq |f(z_0)| \geq |z_0|$, а значит, достигается равенство $|f(z_0)| = |z_0|$. Тогда, опять же по лемме Шварца, $f$ --- поворот.
+\end{proof}
+
+\begin{remark}
+    \todo{Автоморфизмы диска - преобразования Мёбиуса}
+\end{remark}
+
+\begin{definition}
+    $A(G)$ --- векторное пространство функций, аналитичных в $G$. \\
+    $\{f_n\}$ --- последовательность аналитических функций. Тогда $f_n \to f$ в $A(G)$ по поределению означает, что в любом компакте $K \subset G$ выполнено $f_n \rightrightarrows f$ на $K$.
+\end{definition}
+
+\begin{proposition}[Uniform convergence on compact sets, u.c.c.s]
+\label{uccs}
+    $\{f_n\}$ --- последовательность аналитических в $G$ функций, $f_n \to f$ в $A(G)$. Тогда $f$ --- аналитическая в $G$.
+\end{proposition}
+\begin{proof}
+    Если для любого компакта $K \subset G$ $f \in C(K)$, то и $f \in C(G)$. Теперь для проверки аналитичности достаточно показать, что интегралы по замкнутым контурами $\gamma \subset G$ равны 0. Рассмотрим такой контур $\gamma$. Найдётся компакт $K \supset \gamma$ (например, подойдёт замыкание области, которую ограничивает $\gamma$). Поскольку все $f_n$ аналитичны на $K$, $\int_\gamma f_n(z)dz = 0$.
+    \begin{equation*}
+        \left| \int_\gamma f(z)dz - \int_\gamma f_n(z)dz \right| \leq \int_\gamma |f(z) - f_n(z)| |dz| \leq \underset{z \in K}{\sup} |f_n(z) - f(z)| \cdot L(\gamma) \underset{n \to +\infty}{\longrightarrow} 0
+    \end{equation*}
+    где предел равен 0 потому, что на $K$ $f_n \rightrightarrows f$.
+\end{proof}
+
+\begin{remark}
+    Как уже было сказано, $A(G)$ является векторнм пространством. Вообще говоря, на нём можно задать и топологию --- у нас есть определение сходимости, и замкнутыми множествами естественно назвать те, которые содержат свои предельные точки; соответственно, открытыми множествами будут их дополнения.
+\end{remark}
+
+\begin{theorem}
+    $f_n \to f$ в $A(G)$ $\Ra$ $f_n' \to f'$ в $A(G)$.
+\end{theorem}
 
 \end{document}
