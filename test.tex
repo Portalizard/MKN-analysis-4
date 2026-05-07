@@ -43,6 +43,7 @@
     }
 }
 
+\newcommand{\N}{\mathbb{N}}
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Q}{\mathbb{Q}}
@@ -54,6 +55,7 @@
 \newcommand{\D}{\mathbb{D}}
 \newcommand{\vol}{\operatorname{vol}}
 \newcommand{\Int}{\operatorname{Int}}
+\newcommand{\Cl}{\operatorname{Cl}}
 \newcommand{\Fr}{\operatorname{Fr}}
 \newcommand{\Gal}{\operatorname{Gal}}
 \newcommand{\id}{\operatorname{id}}
@@ -69,7 +71,6 @@
 \newcommand{\La}{\Leftarrow}
 \renewcommand{\iff}{\Leftrightarrow}
 \newcommand{\todo}[1]{\colorbox{red}{#1}}
-% \newcommand{\bsum}[2]{\underset{#1}{\overset{#2}{\sum}}}
 
 \newcounter{cnt}
 
@@ -163,7 +164,9 @@
     $f: \C \to \C$, $G \subset \C$ - область. $f$ - аналитична в $G$ $\iff$ $f$ - голоморфна в $G$.
 \end{theorem}
 \begin{proof}
-    $\Ra$: Если функция $f$ - аналитична, она локально предсталяется в виде степенного ряда. Поскольку этот ряд сходится равномерно, его можно почленно дифференцировать. Тогда у него существует производная, а значит, функция $f$ - голоморфна. \\ $\La$: будем доказывать 2 лекции...
+    $\Ra$: Если функция $f$ - аналитична, она локально предсталяется в виде степенного ряда. Поскольку этот ряд сходится равномерно, его можно почленно дифференцировать. Тогда у него существует производная, а значит, функция $f$ - голоморфна.
+    
+    $\La$: докажем позже.
 \end{proof}
 
 \begin{proposition}
@@ -196,9 +199,42 @@
         \underset{\varepsilon \to 0}{\lim} \frac{F(z + i\varepsilon) - F(z)}{i\varepsilon} = \underset{\varepsilon \to 0}{\lim} \frac{1}{i\varepsilon} \int_{[z, z + \varepsilon]} f(s)ds = \underset{\varepsilon \to 0}{\lim} \frac{1}{i\varepsilon} \int_0^1 f(z + ti\varepsilon)dt = \\
          = \frac{1}{i\varepsilon} \int_0^1 f(z + ti\varepsilon)dt = \frac{1}{i} \int_0^{\varepsilon} f(z + ti)dt = f(z)
     \end{gather*}
-    где последнее равенство выполнено в силу равномерной непрерывности $f$ на отрезке. \todo{В силу условия} (4):
+    где последнее равенство выполнено в силу равномерной непрерывности $f$ на отрезке. Теперь рассмотрим предел $\frac{F(z + \varepsilon) - F(z)}{\varepsilon}$. В силу условия (4)
+    \begin{equation*}
+        F(z) = \int_0^x f(s)ds + \int_{x}^{x+iy} f(s)ds = \int_{0}^{iy} f(s)ds + \int_{iy}^{x + iy} f(s)ds
+    \end{equation*}
+
+    \begin{center}
+    \begin{tikzpicture}
+        \begin{scope}[very thick, decoration={markings, mark=at position 0.5 with {\arrow{>}}}, >=Stealth]
+            \draw[postaction={decorate}] (0,0) -- (4,0);
+            \draw[postaction={decorate}] (4,0) -- (4,2);
+            \draw[dashed] (4,2) -- (0,2);
+            \draw[dashed] (0,2) -- (0,0);
+
+            \draw[dashed] (6,0) -- (10,0);
+            \draw[dashed] (10,0) -- (10,2);
+            \draw[postaction={decorate}] (6,2) -- (10,2);
+            \draw[postaction={decorate}] (6,0) node[below left]{$0$} -- (6,2);
+        \end{scope}
+
+        \fill (0,0) circle[radius=2pt] node[below left]{$0$};
+        \fill (6,0) circle[radius=2pt] node[below left]{$0$};
+        \fill (0,2) circle[radius=2pt] node[above left]{$iy$};
+        \fill (6,2) circle[radius=2pt] node[above]{$iy$};
+        \fill (4,0) circle[radius=2pt] node[below right]{$x$};
+        \fill (10,0) circle[radius=2pt] node[below right]{$x$};
+        \fill (4,2) circle[radius=2pt] node[above]{$x+iy$};
+        \fill (10,2) circle[radius=2pt] node[above right]{$x+iy$};
+
+        \draw [->,decorate,decoration={snake,amplitude=.4mm,segment length=2mm,post length=1mm}, thick]
+            (4.5,1) -- (5.5,1);
+    \end{tikzpicture}
+    \end{center}
+
+    Тогда, аналогично первому пределу, получаем, что
     \begin{gather*}
-        \lim \frac{F(z + \varepsilon) - F(z)}{\varepsilon} = \lim \frac{1}{\varepsilon} \int_{[z, z+\varepsilon]} f(z)dz = f(z)
+        \lim_{\varepsilon \to 0} \frac{F(z + \varepsilon) - F(z)}{\varepsilon} = \lim \frac{1}{\varepsilon} \int_{[z, z+\varepsilon]} f(z)dz = f(z)
     \end{gather*}
 \end{proof}
 
@@ -258,26 +294,26 @@
         \int_{\partial P} f(z)dz = \underset{i}{\sum} \int_{\partial P_i} f(z)dz = a \Ra \exists i \left( \left| \int_{\partial P_i} f(z)dz \right| \geq \frac{|a|}{4} \right) 
     \end{equation*}
 
-    Обозначим $P^1 = P_i$, после чего разделим уже $P_i$ на 4 части аналогичным образом. Часть с наибольшим модулем интеграла Обозначим $P^2$. Продолжая прямоугольники с большим модулем интеграла, получим последовательность вложенных прямоугольников $P^1, P^2, \hdots$ причём $\left| \int_{\partial P^n} f(z)dz \right| \geq \frac{|a|}{4^n}$. Отметим, что если стороны $P$ имели длину $A, B$, то стороны $P^n$ будут иметь длину $\frac{A}{2^n}, \frac{B}{2^n}$. Обозначим $\inter_n P^n = z_0$.
+    Обозначим $P^1 = P_i$, после чего разделим уже $P_i$ на 4 части аналогичным образом. Часть с наибольшим модулем интеграла обозначим $P^2$. Продолжая прямоугольники с наибольшим модулем интеграла, получим последовательность вложенных прямоугольников $P^1, P^2, \hdots$ причём $\left| \int_{\partial P^n} f(z)dz \right| \geq \frac{|a|}{4^n}$. Отметим, что если стороны $P$ имели длину $A, B$, то стороны $P^n$ будут иметь длину $\frac{A}{2^n}, \frac{B}{2^n}$. Обозначим $\bigcap_n P^n = z_0$.
 
     \begin{gather*}
         f(z) = f(z_0) + f'(z_0)(z - z_0) + \varphi(z) \\
-        \int_{\partial P^n} f(z)dz = \int_{\partial P^n} f(z_0) + f'(z_0)(z - z_0) + \int_{\partial P^n} \varphi(z)dz
+        \int_{\partial P^n} f(z)dz = \int_{\partial P^n} \Big( f(z_0) + f'(z_0)(z - z_0) \Big) + \int_{\partial P^n} \varphi(z)dz
     \end{gather*}
 
     Первый интеграл является интегралом многочлена по замкнутому контуру; у многочлена есть первообразная, а значит, по предложению \ref{4eqiuv}, этот интеграл равняется 0. Оценим второй интеграл: поскольку $\varphi = o(|z - z_0|)$, начиная с какого-то $n$ $|\varphi(z)| \leq \varepsilon |z - z_0|$. Тогда
 
     \begin{equation*}
-        \left| \int_{\partial P^n} \varphi(z)dz \right| \leq \int_{\partial P^n} \left| \varphi(z)dz \right| \leq \frac{2A + 2B}{2^n} \cdot \varepsilon \frac{A+B}{2^n} \leq 2(A+B)^2 \frac{\varepsilon}{4^n} \underset{\varepsilon \to 0}{\longrightarrow} 0
+        \left| \int_{\partial P^n} \varphi(z)dz \right| \leq \int_{\partial P^n} \left| \varphi(z)dz \right| \leq \frac{2A + 2B}{2^n} \cdot \varepsilon \frac{A+B}{2^n} \leq 2(A+B)^2 \frac{\varepsilon}{4^n}
     \end{equation*}
 
-    Поскольку эта оценка верна для любого $\varepsilon$, $\int_{\partial P^n} \varphi(z)dz = 0$, а значит, и $\int_{\partial P^n} f(z)dz = 0$, но по предположению $\left| \int_{\partial P^n} f(z)dz \right| \geq \frac{|a|}{4^n}$. Получили противоречие, значит, утверждение теоремы выполнено.
+    Поскольку эта оценка верна для любого $\varepsilon$, устремляя $\varepsilon$ к 0, получаем $\int_{\partial P^n} \varphi(z)dz = 0$, а значит, и $\int_{\partial P^n} f(z)dz = 0$. Но по предположению $\left| \int_{\partial P^n} f(z)dz \right| \geq \frac{|a|}{4^n}$. Получили противоречие, значит, утверждение теоремы выполнено.
 
 \end{proof}
 
 \begin{lemma}[об устранимой особенности]
 \label{noness}
-    $z_0 \in \C$, $R > 0$. $f$ - непрерывна и ограничена в $B_R(z_0) \backslash \{z_0\}$. Для любого прямоугольника $P \subset B_R(z_0)$ со сторонами, параллельными осям, такого что $z_0 \not\in P$, $\int_{\partial P} f(z)dz = 0$. Тогда это же верно и для $P$ таких что $z_0 \in P$.
+    $z_0 \in \C$, $R > 0$. $f$ - непрерывна и ограничена в $B_R(z_0) \backslash \{z_0\}$. Для любого прямоугольника $P \subset B_R(z_0)$ со сторонами, параллельными осям, такого что $z_0 \not\in P$, $\int_{\partial P} f(z)dz = 0$. Тогда это же верно и для $P$ таких, что $z_0 \in P$.
 \end{lemma}
 \begin{remark}
     Если заменить шар $B_R(z_0)$ на его замыкание, лемма останется верной и доказывается аналогично.
@@ -316,7 +352,7 @@
     \end{tikzpicture}
     \end{center}
 
-    Заметим, что $P$ можно разделить на две части: тонкую полосу шириной $\varepsilon$ $Q_{\varepsilon}$, которая содержит на своей границе $z_0$, и остальная часть прямоугольника $P_{\varepsilon}$. Поскольку $P_{\varepsilon}$ по построению не содержит $z_0$, интеграл $f$ по $\partial P_{\varepsilon}$ будет равен 0. Значит, для всякого $\varepsilon$ интеграл по $\partial P$ равен интегралу по $\partial Q_{\varepsilon}$.
+    Заметим, что $P$ можно разделить на две части: тонкую полосу шириной $\delta$ $Q_{\delta}$, которая содержит на своей границе $z_0$, и остальная часть прямоугольника $P_{\delta}$. Поскольку $P_{\delta}$ не содержит $z_0$, по условию интеграл $f$ по $\partial P_{\delta}$ будет равен 0. Значит, для всякого $\delta$ интеграл по $\partial P$ равен интегралу по $\partial Q_{\delta}$.
 
     \begin{center}
     \begin{tikzpicture}
@@ -347,10 +383,10 @@
     \end{tikzpicture}
     \end{center}
 
-    Так как $P$ --- компакт, а $f$ непрерывна на $P$, то $f$ и равномерно непрерывна на $P$. Интеграл по $\partial Q_{\delta}$ равен сумме четырёх интегралов по сторонам. Две стороны имеют длину $\delta$, и по равномерной непрерывности $f$ модуль интеграла по ним оценивается сверху $2 \delta \varepsilon$, где $\varepsilon$ из определения равномерной непрерывности. Оставшиеся две стороны проходятся в разных направлениях и лежат на расстоянии $\delta$, а значит, модуль разности интегралов по ним тоже линейно оценивается через $\varepsilon$ в силу равномерной непрерывности.
+    Так как $P$ --- компакт, а $f$ непрерывна на $P$, то $f$ и равномерно непрерывна на $P$. Интеграл по $\partial Q_{\delta}$ равен сумме четырёх интегралов по сторонам. Две стороны имеют длину $\delta$, и по равномерной непрерывности $f$ модуль интеграла по ним оценивается сверху $2 \cdot \delta \varepsilon$, где $\varepsilon$ из определения равномерной непрерывности. Оставшиеся две стороны проходятся в разных направлениях и лежат на расстоянии $\delta$, а значит, модуль разности интегралов по ним тоже линейно оценивается через $\varepsilon$ в силу равномерной непрерывности:
 
     \begin{gather*}
-        \left| \int_{\partial P} f(z)dz \right| = \left| \int_{\partial Q_{\delta}} f(z)dz \right| \leq C \varepsilon + \left| \int_a^b f(t + \delta) - f(t) dt \right| \\
+        \left| \int_{\partial P} f(z)dz \right| = \left| \int_{\partial Q_{\delta}} f(z)dz \right| \leq 2 \delta \varepsilon + \left| \int_a^b f(t + \delta) - f(t) dt \right| \\
         \left| \int_a^b f(t + \delta) - f(t) dt \right| \leq \int_a^b |f(t + \delta) - f(t)| dt \leq (b - a) \varepsilon
     \end{gather*}
 
@@ -365,16 +401,19 @@
 \end{proof}
 
 \begin{proposition}
-    $f$ голоморфна в $G$, $a \in \overline{B_r(a)} \subset G$, $\gamma \subset B_r(a)$ - замкнутый путь. Тогда $\forall z \in B_r(a) \left( f(z) = \frac{1}{2 \pi i} \oint_{\gamma} \frac{f(w)dw}{w - z} \right)$.
+    $f$ голоморфна в $G$, $a \in \overline{B_r(a)} \subset G$, $\gamma \subset B_r(a)$ - простой замкнутый путь. Тогда для любого $z$ внутри области, которую ограничивает $\gamma$, выполнено
+    \begin{equation*}
+        f(z) = \frac{1}{2 \pi i} \int_\gamma \frac{f(w)}{w - z} dw
+    \end{equation*}
 \end{proposition}
 \begin{proof}
     $G$ --- открытая область, $\overline{B_r(a)} \subset G \Ra \exists \varepsilon > 0 \left( B_{r + \varepsilon}(a) \subset G \right)$.
 
-    Зафиксируем $z \in B_{r}(a)$ и определим функцию $g: B_{r + \varepsilon}(a)\backslash\{z\} \to \C$, $g(w) = \frac{f(z) - f(w)}{z - w}$. $g$ голоморфна в $B_{r + \varepsilon}(a)\backslash\{z\}$, значит, по аналогии с теоремой \ref{circ_holom}, для любого прямоугольника $P \subset B_{r + \varepsilon}(a)\backslash\{z\}$ со сторонами, параллельными осям, $\int_{\partial P} g(w)dw = 0$. Значит, можно воспользоваться леммой \ref{noness} и получить, что это верно и для любого $P \subset B_{r + \varepsilon}(a)$. По предложению \ref{4eqiuv}, это эквивалентно тому, что $\int_{\gamma} g(w)dw = 0$ для любого замкнутого пути $\gamma \subset B_{r + \varepsilon}(a)$. Обозначим $S_r = \partial B_r(a) \subset B_{r + \varepsilon}(a)$ --- замкнутый путь. Тогда
+    Зафиксируем $z$ внутри $\gamma$ и определим функцию $g: B_{r + \varepsilon}(a)\backslash\{z\} \to \C$, $g(w) = \frac{f(z) - f(w)}{z - w}$. $g$ голоморфна в $B_{r + \varepsilon}(a)\backslash\{z\}$, значит, по аналогии с теоремой \ref{circ_holom}, для любого прямоугольника $P \subset B_{r + \varepsilon}(a)\backslash\{z\}$ со сторонами, параллельными осям, $\int_{\partial P} g(w)dw = 0$. Значит, можно воспользоваться леммой \ref{noness} и получить, что это верно и для любого $P \subset B_{r + \varepsilon}(a)$. По предложению \ref{4eqiuv}, это эквивалентно тому, что $\int_{\gamma} g(w)dw = 0$ для любого замкнутого пути $\gamma \subset B_{r + \varepsilon}(a)$. Обозначим $S_r = \partial B_r(a) \subset B_{r + \varepsilon}(a)$ --- это простой замкнутый путь, обходимый против часовой стрелки. Тогда
 
     \begin{gather*}
-        \forall z \in B_r(a) \left( \int_{S_r} \frac{f(z) - f(w)}{z - w}dw = \int_{S_r} g(w)dw = 0 \right) \Ra \\
-        \Ra \int{S_r} \frac{f(w)}{z - w}dw = \int_{S_r} \frac{f(z)}{z - w}dw = f(z) \int_{S_r} \frac{dw}{z - w}
+        \int_{S_r} \frac{f(z)}{z - w} - \int_{S_r} \frac{f(w)}{z - w} = \int_{S_r} \frac{f(z) - f(w)}{z - w}dw = \int_{S_r} g(w)dw = 0 \Ra \\
+        \Ra \int_{S_r} \frac{f(w)}{z - w}dw = \int_{S_r} \frac{f(z)}{z - w}dw = f(z) \int_{S_r} \frac{dw}{z - w}
     \end{gather*}
 
     Вычислим $\int_{S_r} \frac{dw}{z - w}$. Заметим, что $w \in S_r \iff |w - a| = r > |z - a|$. Тогда
@@ -392,32 +431,71 @@
     \end{gather*}
     
     Таким образом получаем, что
-
     \begin{gather*}
-        \int_{S_r} \frac{1}{z - w} = - \underset{n = 0}{\overset{\infty}{\sum}} \int_{S_r} \frac{(z - a)^n}{(w - a)^{n+1}} = - 2\pi i \Ra\\\Ra \int_{S_r} \frac{f(w)}{z - w}dw = (- 2\pi i) f(z) \Ra\\\Ra f(z) = \frac{1}{2\pi i} \int_{S_r} \frac{f(w)}{w - z}dw
+        \int_{S_r} \frac{dw}{z - w} = - \underset{n = 0}{\overset{\infty}{\sum}} \int_{S_r} \frac{(z - a)^n}{(w - a)^{n+1}} dw = - 2\pi i \Ra \\
+        \Ra \int_{S_r} \frac{f(w)}{z - w}dw = \int_{S_r} f(z) \frac{1}{z - w}dw = (- 2\pi i) f(z) \Ra\\\Ra f(z) = \frac{1}{2\pi i} \int_{S_r} \frac{f(w)}{w - z}dw
     \end{gather*}
 \end{proof}
 
 \begin{remark}
-    % \todo{Подставляем ряд в интеграл}, используем единственность ряда Тейлора, и получаем что доказали теорему \ref{analit_holom}.
     \begin{align*}
         \frac{1}{w - z} = \underset{n = 0}{\overset{+\infty}{\sum}} \frac{(z - a)^n}{(w - a)^{n+1}} \Ra f(z) = \underset{n = 0}{\overset{+\infty}{\sum}} \frac{1}{2 \pi i} \left(\int_{S_r} \frac{f(w)}{(w - a)^{n+1}} dw\right) (z - a)^n = \underset{n = 0}{\overset{+\infty}{\sum}} c_n (z - a)^n
     \end{align*}
-
     Получили разложение $f$ в степенной ряд, значит, $f$ --- аналитическая, и теорема \ref{analit_holom} доказана.
-\end{remark}
 
-\begin{remark}
     Более того, мы получили явное выражение для $c_n$, которым далее будем пользоваться:
     \begin{equation*}
         c_n = \frac{1}{2 \pi i} \left(\int_{S_r} \frac{f(w)}{(w - a)^{n+1}} dw\right)
     \end{equation*}
-
-    Вообще говоря, \todo{эта формула выполняется} и при $n < 0$ для неаналитических функций $f$.
+    Вообще говоря, эта формула выполняется и при $n < 0$ для функций $f$, которые можно разложить в ряд Лорана.
 \end{remark}
 
 \begin{remark}
-    \todo{Радиус круга аналитичности равен радиусу сходимости ряда.}
+    В предыдущих рассуждениях мы рассматривали точку $a \in G$ и круг некоторого радиуса $r$ вокруг неё, в котором $f$ раскладывается в ряд. Выясним, насколько большим можно взять этот радиус. Обозначим супремум таких радиусов за $R$.
+
+    Ясно, что $R \geq \operatorname{dist}(a, \partial G)$. В самом деле, если это не так, то можно рассмотривать точки на границе шара $B_R(a)$ и раскладывать $f$ в ряд в этих точках. Эти ряды будут совпадать в области с изначальным рядом, а значит, должны просто полностью совпадать с ним. При этом окрестности, в которых сходятся эти ряды, в объединении содержат шар с центром в $a$ и радиусом, который строго больше $R$.
+
+    \begin{center}
+    \begin{tikzpicture}
+        \draw[dashed, very thick] (0,0) circle[radius=3cm];
+        \draw (-2.2,2.2) node[above left]{$G$};
+        \fill (1,0) circle[radius=2pt] node[left]{$a$};
+        \draw[dashed, blue] (1,0) circle[radius=1cm];
+        % \draw[dashed, blue] (1,0) circle[radius=1.3cm];
+        \draw[dashed, red]
+            (1,1) circle[radius=0.5cm]
+            (0,0) circle[radius=1.6cm]
+            (1.7,-0.7) circle[radius=1cm]
+            (1.7,0.7) circle[radius=0.8cm];
+        \fill
+            (1,1) circle[radius=1.5pt]
+            (0,0) circle[radius=1.5pt]
+            (1.7,-0.7) circle[radius=1.5pt]
+            (1.7,0.7) circle[radius=1.5pt];
+        \draw [->,decorate,decoration={snake,amplitude=.4mm,segment length=2mm,post length=1mm}, thick]
+            (3.5,0) -- (4.5,0);
+        
+        \begin{scope}[shift={(8,0)}]
+            \draw[dashed, very thick] (0,0) circle[radius=3cm];
+        \draw (-2.2,2.2) node[above left]{$G$};
+        \fill (1,0) circle[radius=2pt] node[left]{$a$};
+        % \draw[dashed, blue] (1,0) circle[radius=1cm];
+        \draw[dashed, blue] (1,0) circle[radius=1.3cm];
+        \draw[dashed, red]
+            (1,1) circle[radius=0.5cm]
+            (0,0) circle[radius=1.6cm]
+            (1.7,-0.7) circle[radius=1cm]
+            (1.7,0.7) circle[radius=0.8cm];
+        \fill
+            (1,1) circle[radius=1.5pt]
+            (0,0) circle[radius=1.5pt]
+            (1.7,-0.7) circle[radius=1.5pt]
+            (1.7,0.7) circle[radius=1.5pt];
+        \end{scope}
+    \end{tikzpicture}
+    \end{center}
+
+    С другой стороны, видно, что $R \leq \operatorname{dist}(a, \partial G)$. Если бы это было не так, область аналитичности $f$ была бы равна $B_R(a) \union G \supsetneq G$, ведь в любой точке $B_R(a)$ функция $f$ по определению $R$ раскладывается в ряд.
 \end{remark}
 
 \begin{theorem}[Мореры]
@@ -432,15 +510,34 @@
 \begin{proof}
     $(1) \iff (2)$: утверждение теоремы \ref{analit_holom}.\\
     $(2) \Ra (3)$: достаточно применить теорему \ref{circ_holom} и предложение \ref{4eqiuv}.\\
-    $(3) \Ra (2)$: \todo{чё-то сказали пару слов каких-то}.
+    $(3) \Ra (2)$: локальная точность $f(z)dz$ означает, что в окрестности любой точки из $G$ найдётся функция $F$ такая, что $dF = f(z)dz$. Зафиксируем $z \in G$.
+    \begin{gather*}
+        F_x dx + F_y dy = dF = f(z)dz = f dx + i f dy \\
+        \begin{cases}
+            F_x = f \\
+            F_y = if
+        \end{cases} \Ra F_y = i F_x \\
+        F = u + iv \Ra u_y + iv_y = i(u_x + iv_x) = -v_x + iu_x \Ra \begin{cases}
+            u_x = v_y \\
+            u_y = - v_x
+        \end{cases}
+    \end{gather*}
+    то есть для $F$ выполняются условия Коши-Римана в окрестности $z$. Как мы уже знаем, из этого следует, что $F$ в этой окрестности голоморфна, а значит и аналитична, а тогда аналитична и $f$, а тогда $f$ тоже голоморфна в окрестности $z$.
 \end{proof}
 
 \begin{definition}[Гармоническая функция]
-    $f: \C \to \C$ называется \textit{гармонической}, если её вещественная часть $u$ гармонична как функция из $\R^2 \to R$.
+    $f: \C \to \C$ называется \textit{гармонической}, если её вещественная часть $u$ гармонична как функция из $\R^2 \to \R$.
 \end{definition}
 
 \begin{remark}
-    \todo{Что-то про гармоничность и условия Коши-Римана.}
+    Если $f$ аналитична, то она и гармонична:
+    \begin{equation*}
+        f = u + iv,\,
+        \begin{cases}
+            u_x = v_y \\
+            u_y = - v_x
+        \end{cases} \Ra u_x^2 + v_y^2 = 0 \Ra \triangle u = u_x^2 = 0
+    \end{equation*}
 \end{remark}
 
 \begin{remark}
@@ -454,7 +551,7 @@
     $G$ --- ограниченная область, $f$ аналитична в $\overline{G}$. Тогда $\underset{z \in \overline{G}}{\max} |f(z)| = \underset{z \in \partial G}{\max} |f(z)|$.
 \end{proposition}
 \begin{proof}
-    Неравенство $\underset{z \in \overline{G}}{\max} |f(z)| \geq \underset{z \in \partial G}{\max} |f(z)|$ очевидно. $\underset{z \in \overline{G}}{\max} |f(z)|$ достигается, так как $\overline{G}$ замкнута и ограничена, следовательно, компактна. Пусть он достигается в точке $z_0 \notin \partial G$. Тогда $dist(z_0, \partial G) = r > 0$, и $(B_r(z_0) \subset G)$. Если $\underset{z \in \overline{G}}{\max} |f(z)| > \underset{z \in \partial G}{\max} |f(z)|$, то \todo{по непрерывности} $f(z_0) > \int_0^{2\pi} f(z_0 + re^{it})dt$, что противоречит $(\star)$.
+    Неравенство $\underset{z \in \overline{G}}{\max} |f(z)| \geq \underset{z \in \partial G}{\max} |f(z)|$ очевидно. $\underset{z \in \overline{G}}{\max} |f(z)|$ достигается, так как $\overline{G}$ замкнута и ограничена, следовательно, компактна. Пусть он достигается в точке $z_0 \notin \partial G$. Тогда $dist(z_0, \partial G) = r > 0$, и $(B_r(z_0) \subset G)$. Если $\underset{z \in \overline{G}}{\max} |f(z)| > \underset{z \in \partial G}{\max} |f(z)|$, то из непрерывности $f$ следует, что $f(z_0) > \int_0^{2\pi} f(z_0 + re^{it})dt$, что противоречит $(\star)$.
 \end{proof}
 
 \begin{remark}
@@ -467,7 +564,11 @@
     $G$ --- связная область, $f, g$ аналитичны в $G$, и в открытом $U \subset G$ $f \equiv g$. Тогда $f \equiv g$ во всём $G$.
 \end{proposition}
 \begin{proof}
-    $f - g$ --- аналитическая функция, $f - g \equiv 0$ на $U$. Тогда \todo{???}
+    $f - g$ --- аналитическая функция, $f - g \equiv 0$ на $U$. Обозначим за $N \subset G$ множество нулей этой функции. Из условия утверждения следует, что $\Int N \neq \varnothing$. Покажем, что множество $\Cl(\Int N) \subset N$ и открытое, и замкнутое --- тогда из связности $G$ будет следовать, что $N = G$.
+
+    Замкнутость тривиальна. Покажем открытость. У любой точки из $\Int \Int N = \Int N$ по определению есть окрестность, лежащая в $\Int N \subset \Cl(\Int N)$.
+    
+    У точки из $\Fr (\Int N)$ такая окрестность есть, так как в такой точке можно разложить $f - g$ в ряд: окрестность, в которой этот ряд сходится, пересекается с $\Int N$; это пересечение двух открытых множеств, значит, оно открыто; ряд на открытом подмножестве тождественно равен 0, значит, он просто тождественно равен 0; значит, вся окрестность, в которой этот ряд сходится, лежит в $\Int N \subset \Cl(\Int N)$.
 \end{proof}
 
 \begin{proposition}
@@ -523,7 +624,7 @@
 \end{definition}
 
 \begin{remark}
-    Далее в курсе гомотопией будет называться гомотопия с фиксированными концами, то есть $H(a, t) \equiv const$, $H(b, t) \equiv const$. Два пути $\gamma_0, \gamma_1: [a, b] \to G$ называются \textit{гомотопными}, если $\gamma_0(a) = \gamma_1(a)$, $\gamma_0(b) = \gamma_1(b)$, и существует гомотопия $H$ такая, что $H(x, 0) = \gamma_0$, $H(x, 1) = \gamma_1$. Отношение гомотопности обозначается $\gamma_0 \sim \gamma_1$.
+    Далее в курсе гомотопией будет называться гомотопия с фиксированными концами, то есть $H(a, t) \equiv const$, $H(b, t) \equiv const$. Два пути $\gamma_0, \gamma_1: [a, b] \to G$ называются \textit{гомотопными}, если $\gamma_0(a) = \gamma_1(a)$, $\gamma_0(b) = \gamma_1(b)$, и существует гомотопия $H$ такая, что $H(x, 0) = \gamma_0$, $H(x, 1) = \gamma_1$. Отношение гомотопности путей обозначается $\gamma_0 \sim \gamma_1$.
 
     \begin{center}
     \begin{tikzpicture}
@@ -1026,11 +1127,218 @@
 \end{proof}
 
 \begin{remark}
-    Как уже было сказано, $A(G)$ является векторнм пространством. Вообще говоря, на нём можно задать и топологию --- у нас есть определение сходимости, и замкнутыми множествами естественно назвать те, которые содержат свои предельные точки; соответственно, открытыми множествами будут их дополнения.
+    Как уже было сказано, $A(G)$ является векторным пространством. Вообще говоря, на нём можно задать и топологию --- у нас есть определение сходимости, и замкнутыми множествами естественно назвать те, которые содержат свои предельные точки; соответственно, открытыми множествами будут их дополнения.
 \end{remark}
 
 \begin{theorem}
     $f_n \to f$ в $A(G)$ $\Ra$ $f_n' \to f'$ в $A(G)$.
 \end{theorem}
+\begin{proof}
+    Нужно доказать, что на любом компакте $K \subset$ $f_n \rightrightarrows f$. Сначала докажем это не для $K$, а для $B_r \subset \overline{B_{r + \varepsilon}} \subset G$, то есть таких шаров, которые внутри $G$ и отделяются от него замкнутым шаром чуть большего радиуса.
+
+    Зафиксируем $z \in B_r$. Обозначим $\gamma_\varepsilon = \partial B_\varepsilon(z)$. Отметим, что $\gamma_\varepsilon \subset \overline{B_{r + \varepsilon}} \subset G$. Тогда
+    \begin{equation*}
+        f_n'(z) - f'(z) = \frac{1}{2 i \pi} \int_\gamma \frac{(f_n - f)(w) dw}{(w - z)^2} = \frac{1}{2 i \pi} \int_\gamma \frac{(f_n - f) dw}{\varepsilon^2} \Ra |(f_n - f)'(z)| \leq \frac{\max_{z \in \gamma_\varepsilon} |(f_n - f)(z)|}{2 \pi \varepsilon^2}
+    \end{equation*}
+    \begin{equation*}
+        \sup_{z \in B_r} |f_n'(z) - f'(z)| = \sup_{z \in B_r} |(f_n - f)'(z)| \leq \frac{\max_{z \in \gamma_\varepsilon} |(f_n - f)(z)|}{2 \pi \varepsilon^2} \rightrightarrows 0
+    \end{equation*}
+    где последний предел равен 0, так как $f_n \to f$ в $A(G)$.
+\end{proof}
+
+\begin{remark}
+    Тогда если $f_n \to f$ в $A(G)$, то для любого $k \in \N$ $f_n^{(k)} \to f^{(k)}$ в $A(G)$.
+\end{remark}
+
+\begin{proposition}
+    Условие $f_n \rightrightarrows f$ на $K$ эквивалентно условию $\int_K |f_n(z) - f(z)| d \lambda_2^*(z) \to 0$.
+\end{proposition}
+\begin{proof}
+    $\Ra$: $\left| \int_K |f_n(z) - f(z)| d \lambda_2^*(z) \right| \leq \lambda_2^*(K) \cdot \max_{z \in K} |f_n(z) - f(z)| \to 0$.
+
+    $\La$: рассмотрим $a \in K$. Обозначим $B_\varepsilon = B_\varepsilon(a)$, $K_\varepsilon$ --- $\varepsilon$-окрестность $K$. Как известно, $K \subset G \Ra \exists \varepsilon (K_\varepsilon \subset G)$. Тогда
+    \begin{equation*}
+        |f_n(a) - f(a)| = \left| \frac{1}{\lambda_2^*(B_\varepsilon)} \int_{B_\varepsilon} (f_n(w) - f(w)) d \lambda_2^*(w) \right| \leq \frac{1}{\lambda_2^*(B_\varepsilon)} \int_{B_\varepsilon} |f_n(w) - f(w)| d \lambda_2^*(w)
+    \end{equation*}
+    Поскольку $a \in K$, $B_\varepsilon \subset K_\varepsilon$. Тогда
+    \begin{equation*}
+        \frac{1}{\lambda_2^*(B_\varepsilon)} \int_{B_\varepsilon} |f_n(w) - f(w)| d \lambda_2^*(w) \leq \frac{1}{\lambda_2^*(B_\varepsilon)} \int_{K_\varepsilon} |f_n(w) - f(w)| d \lambda_2^*(w) \underset{n \to +\infty}{\longrightarrow} 0
+    \end{equation*}
+    Эта оценка не зависит от $a$, значит, $f_n \rightrightarrows f$ на $K$.
+\end{proof}
+
+\begin{remark}
+    Если $\{f_n\}$ --- однолистные функции, и $f_n \to f$ в $A(G)$, то $f$ может не быть однолистной: например, если $f_n = c + \frac{1}{n z}$, то $f = c$. Однако оказывается, что это единственное возможно препятствие.
+\end{remark}
+
+\begin{theorem}[Об однолистности]
+\label{one_leaf}
+    $G$ --- свзяная область, $\{f_n\}$ --- однолистные в $G$ функции, $f_n \to f$ в $A(G)$. Тогда $f$ либо тождественно равна константе, либо однолистна.
+\end{theorem}
+\begin{proof}
+    Предположим противное, то есть что $f$ не константа и не однолистна. Тогда $\exists z_1, z_2 (f(z_1) = f(z_2))$, не умаляя общности можно считать, что $f(z_1) = f(z_2) = 0$, иначе вычтем константу. Выберем такой $\varepsilon$, что $z_1 \in \overline{B_\varepsilon(z_1)} \subset G$ и $z_2 \in \overline{B_\varepsilon(z_2)} \subset G$, и $B_\varepsilon(z_1) \inter B_\varepsilon(z_2) = \varnothing$. По утверждению (\ref{uccs}), $f$ аналитична, значит, можно написать
+    \begin{gather*}
+        f(z) = 0 + (z - z_1)^{k_1} g_1(z), \quad g_1(z_1) \neq 0
+    \end{gather*}
+    Тогда при $z \in \partial B_\varepsilon(z_1)$
+    \begin{equation*}
+        |f(z)| = \varepsilon^{k_1} \cdot |g_1(z)| = \varepsilon^{k_1} \cdot |g_1(z_1) + o(1)| = \varepsilon^{k_1} \cdot |g_1(z_1)| + o(\varepsilon^{k_1})
+    \end{equation*}
+    Последнее выражение при достаточно малом $\varepsilon$ строго больше $\frac{\varepsilon^{k_1}}{2} g_1(z_1)$. $\partial B_\varepsilon(z_1)$ --- компакт, значит, на нём $f_n \rightrightarrows f$. Тогда для достаточно большого $N$ для любого $n > N$ верно
+    \begin{equation*}
+        |f| > \frac{\varepsilon^{k_1}}{2} g_1(z_1) > \frac{\varepsilon^{k_1}}{4} g_1(z_1) > |f_n - f|
+    \end{equation*}
+
+    Теперь можно применить теорему Руше (\ref{rouche}) для пары функций $(f, f_n - f)$ и контура $\partial B_\varepsilon(z_1)$. Получаем, что у функций $f$ и $f + (f_n - f) = f_n$ одинаковое число корней внутри $\partial B_\varepsilon(z_1)$. У $f$ такой корень хотя бы 1 (собственно, $z_1$). Таким образом, для достаточно большого $N$ при любом $n > N$ $f_n$ имеет корень в $B_\varepsilon(z_1)$.
+
+    По абсолютно аналогичному рассуждению, $f_n$ имеет корень также и в $B_\varepsilon(z_2)$. $B_\varepsilon(z_1) \inter B_\varepsilon(z_2) = \varnothing$, следовательно, эти корни не совпадают, значит, у $f_n$ хотя бы 2 корня. Но если $f_n$ --- однолистная, то это невозможно по определению.
+\end{proof}
+
+\begin{definition}[Локальная однолистность]
+    Функция $f$ называется \textit{локально однолистной} в $G$, если вокруг всякой точки $z_0 \in G$ найдётся окрестность, в которой $f$ однолистна.
+\end{definition}
+
+\begin{theorem}[О локальной однолистности]
+    $f$ локально однолистна $\iff \forall z_0 \in G (f'(z_0) \neq 0)$. 
+\end{theorem}
+\begin{proof}
+    $\Ra$: Предположим противное, то есть нашлась точка $z_0$ такая, что $f'(z_0) = 0$. Тогда
+    \begin{equation*}
+        f(z) = f(z_0) + (z - z_0)^k g(z),\, k \geq 2,\, g(z_0) \neq 0
+    \end{equation*}
+
+    Раз уж $g(z_0) \neq 0$, можно выбрать $\varepsilon$ такой, что в $B_\varepsilon(z_0)$ $|g(z)| \geq a$. В $B_\varepsilon(z_0)$ $g(z) \neq 0$, значит, можно определить $h(z)$ такое, что $e^{h(z)} = g(z)$. Обозначим $\tilde{g}(z) = e^{h(z) / k}$. Тогда
+    \begin{equation*}
+        f(z) = f(z_0) + \left( (z - z_0) \tilde{g}(z) \right)^k
+    \end{equation*}
+
+    Будем решать уравнение $f(z) = f(z_0) + w$ для фиксированного $w$ малого модуля. Это эквивалентно уравнению $(z - z_0)\tilde{g}(z) = s \in \sqrt[k]{w}$. Заметим, что если уравнение такого вида можно решить вне зависимости от выбора конкретного $s$, то, поскольку таких $s$ ровно $k \geq 2$, функция $f(z)$ окажется не однолистной.
+
+    Обозначим $\tilde{g}(z) = \tilde{g}(z_0) + \tilde{\tilde{g}}(z)$, где $\tilde{\tilde{g}}(z) = o(1)$. К функциям $(z - z_0)\tilde{g}(z_0) - s$, $\tilde{\tilde{g}}(z)(z - z_0)$ можно применить теорему Руше (\ref{rouche}): \todo{почему}? Функция $(z - z_0)\tilde{g}(z_0) - s$ линейна, то есть у неё есть ровно 1 корень - тогда у функции $(z - z_0)(\tilde{g}(z_0) + \tilde{\tilde{g}}(z)) - s$ тоже есть 1 корень, что и требовалось.
+
+    $\La$: не умаляя общности, $f(z_0) = 0$ (иначе можно вычесть константу). Знаем, что $f'(z_0) \neq 0$. Тогда
+    \begin{equation}\tag{$\star$}
+        f(z) = f'(z_0)(z - z_0) + g(z), \quad g(z) = o(z - z_0)
+    \end{equation}
+
+    Пусть $f(z_1) = f(z_2)$, $|z - z_1|, |z - z_2| < \varepsilon$. Подставим $z_1, z_2$ в формулу выше и вычтем:
+    \begin{equation*}
+        f'(z_0)(z_1 - z_2) + g(z_1) - g(z_2) = f(z_1) - f(z_2) = 0
+    \end{equation*}
+    \begin{equation*}
+        |g(z_1) - g(z_2)| = \left| \int_{z_1}^{z_2} g'(s)ds \right| \leq |z_1 - z_2| \underset{|z_0 - s| < \varepsilon}{\max} |g'(s)|
+    \end{equation*}
+
+    Покажем, что этот $\max$ настолько быстро стремится к 0 при $\varepsilon \to 0$, что равенство $(\star)$ не может выполняться.
+    \begin{equation*}
+        \underset{|z_0 - s| < \varepsilon}{\max} |g'(s)| \leq \underset{|z_0 - s| < \varepsilon}{\max} \left| \frac{1}{2 \pi i} \int_{S_\delta(z)} \frac{g(w)}{(w - z)^2} dw \right| \leq \frac{2 \pi \delta}{2 \pi} \cdot \frac{1}{\delta^2} \cdot \underset{|z_0 - s| < \varepsilon}{\max} |g(s)| = \frac{1}{\delta} \underset{|z_0 - s| < \varepsilon}{\max} |g(s)|
+    \end{equation*}
+    Это верно для всякого $\delta$. Пусть $z_1, z_2 \in B_{\frac{\varepsilon}{2}}(z_0)$. Расмотрим $\delta = \frac{\varepsilon}{2}$:
+    \begin{equation*}
+        \frac{2}{\varepsilon} \underset{|z_0 - s| < \varepsilon}{\max} |g(s)| \underset{\varepsilon \to 0}{\longrightarrow} 0
+    \end{equation*}
+    так как $g(z) = o(z - z_0)$. Подставляя итоговую оценку в $(\star)$, перенося $g(z_1) - g(z_2)$ в правую часть, и беря модуль, получаем
+    \begin{equation*}
+        |f'(z_0) (z_1 - z_2)| \leq |z_1 - z_2| o(1)
+    \end{equation*}
+    Левая часть убывает линейно и не равна 0, а вторая убывает быстрее при $\varepsilon \to 0$.
+\end{proof}
+
+\begin{definition}[Компактность в $A(G)$]
+    Семейство $\{f_n\}_{n \in I} \subset A(G)$ называется \textit{компактным}, если в любой последовательсти функций из него содержится сходящаяся в $A(G)$ последовательность.
+\end{definition}
+\begin{remark}
+    Вообще говоря, это свойство правильно называть "<относительная секвенциальнциальная компактность">, но в этом курсе мы будет просто говорить "<компактность">.
+\end{remark}
+
+\begin{lemma}
+    Если $\{f_n\}_{n \in I}$ равномерно ограничена, то и $\{f_n'\}_{n \in I}$ равномерно ограничена.
+\end{lemma}
+\begin{proof}
+    \begin{equation*}
+        f_n'(z) = \frac{1}{2 \pi i} \int_{S_\varepsilon(z)} \frac{f_n(w)}{(w - z)^2} dw
+    \end{equation*}
+\end{proof}
+
+\begin{theorem}[Монтеля]
+\label{montel}
+    $\{f_n\}_{n \in I}$ - компактна $\iff$ $\{f_n\}_{n \in I}$ равномерно ограничена, то есть
+    \begin{equation*}
+        \forall K \subset G, \text{K - компакт } \exists C = C(K) \forall z \in K \forall n \in I \big( |f_n(z)| \leq C(K) \big)
+    \end{equation*}
+\end{theorem}
+\begin{proof}
+    $\La$: Зафиксируем компакт $K$. Рассмотрим в $K$ конечную $\varepsilon$-сеть. 
+    
+    \todo{вспомнить что тут было вообще}
+    \begin{equation*}
+        \forall \varepsilon > 0 \exists \delta = \delta(\varepsilon, K) \forall z_1, z_2 \in K \forall f_n \in \{f_n\}_{n \in I} \big( |z_1 - z_2| < \delta \Ra |f_n(z_1) - f_n(z_2)| < \varepsilon \big)
+    \end{equation*}
+
+    $\Ra$: Предположим противное, то есть $\exists K \left( \underset{z \in K}{\sup} |f_n(z)| \underset{n \to +\infty}{\longrightarrow} +\infty \right)$. Можно считать $|f_l(z_l)| > l$, тогда сходящейся подпоследовательности не существует.
+\end{proof}
+
+\begin{theorem}[Арцела-Асколи]
+    $K$ --- метрический компакт. Тогда $\{f_i\} \subset C(K)$ компактна $\iff$ $\{f_i\}$ равномерно ограничена и равностепенно непрерывна.
+\end{theorem}
+
+\begin{definition}[Конформное отображение]
+    \todo{.}
+\end{definition}
+
+\begin{theorem}[Римана]
+    $G$ --- односвязная область в $\hat{\C}$, $|\partial G| \geq 2$. Тогда $G$ переводится в единичный открытый диск $D$ конформным отображением.
+\end{theorem}
+\begin{proof}
+    Рассмотрим класс функций $\{\varphi\} = I$ такой что
+    \begin{enumerate}
+        \item $\varphi \in A(G)$
+        \item $\varphi$ --- однолистная
+        \item $\varphi(G) \subset D$
+    \end{enumerate}
+
+    Будем максимизировать функционал $J(\varphi) = |\varphi'(a)|$, где $a$ --- некоторая фиксированная точка в $G$.
+
+    Сначала, добавим в $I$ константные функции, по модулю не превосходящие 1. Теперь $I$ --- замкнутый класс по теореме об однолистности (\ref{one_leaf}).
+
+    Во-вторых, заметим, что $J$ --- непрерывный функционал, поскольку
+    \begin{equation*}
+        \varphi'(a) = \frac{1}{2 \pi i} \int_{S_\varepsilon(a)} \frac{\varphi(w)}{(w - a)^2} dw
+    \end{equation*}
+    \todo{и что?}
+
+    Значит, по теореме Арцела-Асколи (\todo{как её применить?}) $I$ --- компакт, значит, $A = \underset{\varphi \in I}{\sup} |\varphi'(a)|$ достигается. Покажем, что $A \neq 0$.
+
+    Если есть $z_0 \notin \operatorname*{Cl}(G)$, то функция $\frac{1}{z - z_0}$ ограничена на $G$, а значит, для достаточно малого $\varepsilon > 0$ функция $\frac{\varepsilon}{z - z_0} \in I$, поскольку модуль её значений можно сделать $< 1$, а однолисточно очевидна.
+    
+    Однако, может оказаться, что $\operatorname*{Cl}(G) = \hat{\C}$ (например, $G = \hat{\C} \setminus [0, 1]$). Рассмотрим две различные точки $\alpha, \beta \in \partial G$. Поскольку $G$ односвязна, можно однозначно определить функцию $\sqrt{\frac{z - \alpha}{\beta}}$:
+    \begin{equation*}
+        g(z) = \frac{z - \alpha}{z - \beta} \Ra h(z) = \sqrt{\frac{z - \alpha}{z - \beta}} = e^{\frac{1}{2} \log(g(z))}
+    \end{equation*}
+    При этом таких функций две, $h_1(z), h_2(z)$, поскольку у $\sqrt{}$ две ветви. Каждая функция $h_i$ однолистна:
+    \begin{equation*}
+        h_i(z_1) = h_i(z_2) \Ra \frac{z_1 - \alpha}{z_1 - \beta} = h_i^2(z_1) = h_i^2(z_2) = \frac{z_2 - \alpha}{z_2 - \beta} \Ra (z_1 - \alpha)(z_2 - \beta) = (z_2 - \alpha)(z_1 - \beta) \Ra z_1 = z_2
+    \end{equation*}
+    Естественным образом, $h_1(z) = -h_2(z)$. Оказывается, что их образы не пересекаются:
+    \begin{equation*}
+        h_1(z_1) = h_2(z_2) \Ra h_1(z_1) = -h_1(z_2) \Ra h_1^2(z_1) = h_1^2(z_2) \Ra z_1 = z_2
+    \end{equation*}
+    (последнее следствие проводится аналогично предыдущей формуле). 
+
+    $h_i$ есть конформное отображение на $h_i(G)$, значит, \todo{можно сделать} аналогично первому случаю.
+
+    Итого, мы выяснили, что $A \neq 0$. Теперь покажем, что функция, на которой достигается этот супремум, должна действовать во весь $D$. Обозначим эту функцию $\varphi_0$.
+
+    Заметим, что $\varphi_0(a) = 0$. Предположим противное, $\varphi_0(a) \neq 0$. Тогда
+    \begin{gather*}
+        \xi(z) = \frac{\varphi_0(z) - \varphi_0(a)}{1 - \overline{\varphi_0(a)} \varphi_0(z)} = \mu_{\varphi_0(a)} \circ \varphi_0 \\
+        \xi' = \frac{\varphi_0'(a)}{1 - \overline{\varphi_0(a)} \varphi_0(a)} = \frac{\varphi_0'(a)}{1 - |\varphi_0(a)|^2} \\
+        1 - |\varphi_0(a)|^2 \in \R, \leq 1
+    \end{gather*}
+    Но тогда $\varphi_0$ --- не максимум $J$, потому что $J(\xi) > J(\varphi)$, противоречие.
+
+    Пусть $\varphi_0(G) \neq D$, $b \in D \setminus \varphi_0(G)$.
+    \todo{Дописать доказательство}.
+\end{proof}
 
 \end{document}
