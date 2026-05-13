@@ -5,6 +5,8 @@
 \usepackage[letterpaper,top=2cm,bottom=2cm,left=2cm,right=2cm,marginparwidth=1.75cm]{geometry}
 \usepackage{amsmath,amsthm,amssymb}
 \usepackage{bbm}
+\usepackage{ifthen}
+\usepackage{intcalc}
 \usepackage{hyperref}
 \hypersetup{
     colorlinks=true,     
@@ -23,10 +25,16 @@
 % \usepackage{xcolor}
 \usepackage{mathabx}
 \usepackage{tikz}
-\usetikzlibrary {arrows.meta}
-\usetikzlibrary {decorations.pathmorphing}
-\usetikzlibrary {decorations.markings}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{decorations.markings}
 \usetikzlibrary{bending}
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{graphs}
+\usetikzlibrary{shapes.geometric}
+
 
 \tikzset{
     pics/cross/.style ={
@@ -41,6 +49,32 @@
             \draw[-{Stealth[length=7pt, bend]}] (0,-0.2) arc[start angle=-90, end angle=90, radius=0.2cm];
         }
     }
+}
+
+% angle1, angle2, radius
+\def\drawarc#1#2#3{%
+  (#1:#3) arc[start angle={\ifdim#1pt<#2pt #1-90\else #1-270\fi},
+            end angle={\ifdim#1pt<#2pt #2-270\else #2-90\fi},
+            radius={#3*tan((\ifdim#1pt<#2pt #2-#1\else #1-#2\fi)/2)}]
+}
+\pgfkeys{
+  /drawctri/.is family, /drawctri,
+  line1/.initial = black,
+  line2/.initial = black,
+  line3/.initial = black,
+  fillc/.initial = white,
+}
+\NewDocumentCommand{\drawctri}{ O{} m m m m }{
+  \pgfkeys{/drawctri, #1}% применить переданные ключи (остальные берут .initial)
+  \fill[color=\pgfkeysvalueof{/drawctri/fillc}] \drawarc{#2}{#3}{#5} -- \drawarc{#3}{#4}{#5} -- \drawarc{#4}{#2}{#5} -- cycle;
+  \draw[thick, color=\pgfkeysvalueof{/drawctri/line1}] \drawarc{#2}{#3}{#5};
+  \draw[thick, color=\pgfkeysvalueof{/drawctri/line2}] \drawarc{#3}{#4}{#5};
+  \draw[thick, color=\pgfkeysvalueof{/drawctri/line3}] \drawarc{#4}{#2}{#5};
+}
+
+\newcommand{\pickc}[1]{%
+  \ifcase#1%
+    green\or blue\or red\else black\fi%
 }
 
 \newcommand{\N}{\mathbb{N}}
@@ -447,7 +481,7 @@
     \begin{equation*}
         c_n = \frac{1}{2 \pi i} \left(\int_{S_r} \frac{f(w)}{(w - a)^{n+1}} dw\right)
     \end{equation*}
-    Вообще говоря, эта формула выполняется и при $n < 0$ для функций $f$, которые можно разложить в ряд Лорана.
+    Вообще говоря, эта формула выполняется и при $n < 0$ для неаналитических функций.
 \end{remark}
 
 \begin{remark}
@@ -624,28 +658,60 @@
 \end{definition}
 
 \begin{remark}
-    Далее в курсе гомотопией будет называться гомотопия с фиксированными концами, то есть $H(a, t) \equiv const$, $H(b, t) \equiv const$. Два пути $\gamma_0, \gamma_1: [a, b] \to G$ называются \textit{гомотопными}, если $\gamma_0(a) = \gamma_1(a)$, $\gamma_0(b) = \gamma_1(b)$, и существует гомотопия $H$ такая, что $H(x, 0) = \gamma_0$, $H(x, 1) = \gamma_1$. Отношение гомотопности путей обозначается $\gamma_0 \sim \gamma_1$.
+    Два пути $\gamma_0, \gamma_1: [a, b] \to G$ называются \textit{гомотопными}, если существует гомотопия $H$ такая, что $H(x, 0) = \gamma_0$, $H(x, 1) = \gamma_1$. Отношение гомотопности путей обозначается $\gamma_0 \sim \gamma_1$.
 
+    Гомотопию путей удобно схематично изображать как прямоугольник области определения с обозначениями, в какие интересующие нас пути перейдут его стороны при действии $H$:
     \begin{center}
     \begin{tikzpicture}
-        
+        \begin{scope}[very thick, decoration={markings, mark=at position 0.6 with {\arrow{>}}}, >=Stealth]
+            \draw (0,0) node[below left]{$(a,0)$} -- (3,0) node[below right]{$(a,1)$};
+            \draw[postaction={decorate}] (3,0) -- node[right]{$\gamma_1$} (3,2);
+            \draw (3,2) node[above right]{$(b,1)$} -- (0,2) node[above left]{$(b,0)$};
+            \draw[postaction={decorate}] (0,0) -- node[left]{$\gamma_0$} (0,2);
+        \end{scope}
+        \draw[dashed, decoration={markings, mark=at position 0.55 with {\arrow{>}}}, >=Stealth, postaction={decorate}] (1,0) -- (1,2);
+        \draw[dashed, decoration={markings, mark=at position 0.55 with {\arrow{>}}}, >=Stealth, postaction={decorate}] (2,0) -- (2,2);
+        \fill
+            (0,0) circle[radius=2pt]
+            (3,0) circle[radius=2pt]
+            (0,2) circle[radius=2pt]
+            (3,2) circle[radius=2pt];
+        \draw[-Latex] (4,1) -- node[above]{$H$} (5,1);
+        \begin{scope}[shift={(7,0)}]
+            \fill
+                (0,0) coordinate(a) circle[radius=2pt]
+                ++(-1,2) coordinate(b) circle[radius=2pt]
+                ++(3,1) coordinate(c) circle[radius=2pt]
+                ++(1,-2) coordinate(d) circle[radius=2pt];
+            \begin{scope}[very thick, decoration={markings, mark=at position 0.6 with {\arrow{>}}}, >={Stealth[bend]}]
+                \draw[postaction={decorate}]
+                    (a) .. controls ($(a) + (0,1)$) and ($(b) - (0,1)$) .. node[below left]{$\gamma_0$} (b);
+                \draw[postaction={decorate}]
+                    (d) .. controls ($(d) + (0,1)$) and ($(c) - (0,1)$) .. node[above right]{$\gamma_1$} (c);
+            \end{scope}
+            \draw[very thick]
+                (b) .. controls +(right:1) and +(left:1) .. (c) coordinate[pos=1/3](u1) coordinate[pos=2/3](u2)
+                (d) .. controls +(left:1) and +(right:1) .. (a) coordinate[pos=1/3](d2) coordinate[pos=2/3](d1);
+            \begin{scope}[dashed, decoration={markings, mark=at position 0.55 with {\arrow{>}}}, >={Stealth[bend]}]
+                \draw[postaction={decorate}]
+                    (d1) .. controls +(0.3,1.2) and +(-0.3,-1.5) .. (u1);
+                \draw[postaction={decorate}]
+                    (d2) .. controls +(0.3,1.5) and +(-0.3,-1.2) .. (u2);
+            \end{scope}
+        \end{scope}
     \end{tikzpicture}
     \end{center}
+
+    Гомотопия формализует понятие "<непрерывного изменения пути">.
+
+    Далее в курсе гомотопией будет называться гомотопия с фиксированными концами, то есть $H(a, t) \equiv const$, $H(b, t) \equiv const$.
 \end{remark}
 
 \begin{theorem}
     $f$ голоморфна в $G$, $\gamma_0 \sim \gamma_1 \Ra \int_{\gamma_0} f(z)dz = \int_{\gamma_1} f(z)dz$.
 \end{theorem}
 \begin{proof}
-    $H([a, b] \times [0, 1])$ --- компакт. Выберем у него конечное покрытие $B_1, \dots, B_N \subset G$. По лемме Лебега для достаточно малого $\varepsilon > 0$ образ при $H$ любого прямоугольника со сторонами меньше $\varepsilon$ целиком попадает в какой-нибудь $B_l$.
-
-    Разобьём $[a, b] \times [0, 1]$ на такие прямоугольники $\Delta_{jk}$, $1 \leq j \leq m$, $1 \leq k \leq n$.
-
-    \begin{center}
-    \begin{tikzpicture}
-        
-    \end{tikzpicture}
-    \end{center}
+    $H([a, b] \times [0, 1])$ --- компакт. Выберем у него конечное покрытие $B_1, \dots, B_N \subset G$. По лемме Лебега для достаточно малого $\varepsilon > 0$ образ при $H$ любого прямоугольника со сторонами меньше $\varepsilon$ целиком попадает в какой-нибудь $B_l$.Разобьём $[a, b] \times [0, 1]$ на такие прямоугольники $\Delta_{jk}$, $1 \leq j \leq m$, $1 \leq k \leq n$.
 
     $H(\Delta_{jk}) \subset B_l$, $f$ аналитична в $B_l$, значит
     \begin{equation*}
@@ -739,7 +805,7 @@
 \end{proposition}
 \begin{proof}
     \begin{enumerate}
-        \item В точке $a$ у $f$ устранимая особенность $\iff$ (по лемме \ref{noness}) $f$ аналитична в окрестности $a$ $\iff$ $f = \sum c_n (z - a)^n$ $\iff$ главная часть $\equiv 0$.
+        \item В точке $a$ у $f$ устранимая особенность $\iff$ (по лемме \ref{noness}) $f$ аналитична в окрестности $a$ $\iff$ $f = \sum_{n\geq 0} c_n (z - a)^n$ $\iff$ главная часть $\equiv 0$.
         \item $\Ra$: Пусть в точке $a$ у $f$ полюс. Рассмотрим функцию $\frac{1}{f(z)}$, $f$ непрерывна и $|f(z)| \to +\infty$ при $z \to a$, значит, $|f|$ отделено 0 в некоторой окрестности $a$, значит $\frac{1}{f}$ определена и ограничена в этой окрестности. Тогда у $\frac{1}{f}$ в точке $a$ устранимая особенность, и тогда, по пункту $(1)$, \begin{gather*}
             \frac{1}{f(z)} = \underset{n=0}{\overset{+\infty}{\sum}} d_n (z - a)^n = c_{d^*} (z - a)^{d^*} + \underset{n > d^*}{\sum} d_n (z - a)^n \Ra \\ 
             \Ra \left| \frac{1}{f(z)} \right| = (c_{d^*} + \underline{o}(1)) |z - a|^{d^*} \Ra |f(z)| \leq C|z - a|^{-d^*}
@@ -776,15 +842,31 @@
 \end{definition}
 
 \begin{definition}[Вычет]
-    Если $f = \sum c_n (z - a)^n$, то \textit{вычетом} $f$ в точке $a$ называется $c_{-1}$. Вычет обозначается как $\Res_a f$.
+    Если $f = \sum_{n \in \Z} c_n (z - a)^n$, то \textit{вычетом} $f$ в точке $a$ называется $c_{-1}$. Вычет обозначается как $\Res_a f$.
 \end{definition}
 
 \begin{lemma}
-    \todo{Про обход полюса и вычет}
+    Пусть $f$ аналитична в $B_r(a) \setminus \{a\}$. Тогда для $\varepsilon < r$ верно
     \begin{equation*}
-        \int_{S_{\varepsilon}} f(w)dw = 2 \pi i \cdot \Res_a f
+        \int_{|z - a| = \varepsilon} f(w)dw = 2 \pi i \cdot \Res_a f
     \end{equation*}
 \end{lemma}
+\begin{proof}
+    Зафиксируем $\varepsilon < r$. Тогда в кольце $A_{\frac{\varepsilon}{2}, r}$ $f(w)$ представляется как $\sum_{n \in \Z} c_n (w - a)^n$. Вычислим искомый интеграл от каждого слагаемого:
+    \begin{align*}
+        \int_{|z - a| = \varepsilon} (w - a)^n dw &= \int_{0}^{2 \pi} ((\varepsilon e^{it} + a) - a)^n \cdot \varepsilon i e^{it} dt \\
+        &= i \varepsilon^{n+1} \cdot \int_{0}^{2 \pi} e^{i (n+1) t} dt \\
+        &= \begin{cases}
+            0, & n \neq -1 \\
+            2 \pi i, & n = -1
+        \end{cases}
+    \end{align*}
+
+    Таким образом, получаем, что
+    \begin{equation*}
+        \int_{|z - a| = \varepsilon} f(w)dw = \sum_{n \in \Z} \left( c_n \int_{|z - a| = \varepsilon} (w - a)^n dw \right) = c_{-1} \cdot 2 \pi i = 2 \pi i \cdot \Res_a f
+    \end{equation*}
+\end{proof}
 
 \begin{theorem}[О вычетах]
 \label{res}
@@ -811,14 +893,18 @@
     \end{gather*}
     Функция $\frac{e^{iz}}{1 + z^2}$ аналитична в $\C \backslash \{i, -i\}$. Для применения теоремы \ref{res} замкнём контур верхней полуокружностью радиуса $R$, обозначим эту дугу $\gamma_+$. Обозначим получившийся контур $\gamma_R$.
 
-    % \begin{center}
-    % \begin{tikzpicture}
-    %     \draw (-3,0) node[below]{$-R$} (0,0) -- (3, 0) node[below]{$R$};
-    %     \draw[-{Stealth}] (-3,0) -- (0,0);
-    %     \draw (0,1) node[below right]{$i$} pic{cross};
-    %     \draw[-{Stealth}] (3,0) arc[start angle=0, end angle=90, radius=3];
-    % \end{tikzpicture}
-    % \end{center}
+    \begin{center}
+    \begin{tikzpicture}
+        \begin{scope}[thick, decoration={markings, mark=at position 0.52 with {\arrow{>}}}, >={Stealth[bend]}]
+            \draw[postaction={decorate}] (-3,0) node[below]{$-R$} -- (3,0) node[below]{$R$};
+            \draw[postaction={decorate}] (3,0) arc [start angle=0, end angle=180, radius=3] node[pos=0.75, above left]{$\gamma_+$};
+        \end{scope}
+        \draw (0,1) node[below]{$i$} pic{cross};
+        \fill 
+            (-3,0) circle[radius=2pt]
+            (3,0) circle[radius=2pt];
+    \end{tikzpicture}
+    \end{center}
 
     По теореме \ref{res}
     \begin{gather*}
@@ -834,18 +920,30 @@
 
 \begin{remark}
     Вычислим ещё один интеграл: $\int_\R \frac{\sin x}{x} dx$. Из прошлых семестров мы уже знаем, что он равен $\pi$ --- получим этот результат методами комплексного анализа.
-
-    $\frac{\sin z}{z} = \frac{e^{iz} - e^{-iz}}{2iz}$ --- целая функция. Хотим замкнуть контур, но в точке $z = 0$ функция $\frac{e^{iz}}{z}$ не суммируема, поэтому будем интегрировать по $[-R, -\varepsilon] \union [\varepsilon, R]$, устремляя $R \to +\infty, \varepsilon \to 0$. Такую пару отрезков можно замкнуть половиной кольца $A_{\varepsilon, R}$. Назовём полученный контур $\gamma_{\varepsilon, R}$, верхнюю полуокружность $c_R^+$, нижнюю $c_\varepsilon^+$.
-
-    % \begin{center}
-    % \begin{tikzpicture}
-        
-    % \end{tikzpicture}
-    % \end{center}
-
     \begin{equation*}
         \int_\R \frac{\sin x}{x} dx = \lim_{\substack{\varepsilon \to 0 \\ R \to +\infty}} \int_{\varepsilon < |x| < R} \frac{\sin x}{x} dx = \lim_{\substack{\varepsilon \to 0 \\ R \to +\infty}} \frac{1}{i} \int_{\varepsilon < |x| < R} \frac{e^{ix}}{x} dx
     \end{equation*}
+    
+    Хотим замкнуть контур, но в точке $z = 0$ функция $\frac{e^{iz}}{z}$ не суммируема, поэтому будем интегрировать по $[-R, -\varepsilon] \union [\varepsilon, R]$, устремляя $R \to +\infty, \varepsilon \to 0$. Такую пару отрезков можно замкнуть половиной кольца $A_{\varepsilon, R}$. Назовём полученный контур $\gamma_{\varepsilon, R}$, верхнюю полуокружность $c_R^+$, нижнюю $c_\varepsilon^+$.
+
+    \begin{center}
+    \begin{tikzpicture}
+        \begin{scope}[thick, decoration={markings, mark=at position 0.52 with {\arrow{>}}}, >={Stealth}]
+            \draw[postaction={decorate}] (-3,0) node[below]{$-R$} -- (-0.5,0) node[below left]{$-\varepsilon$};
+            \draw[postaction={decorate}] (0.5,0) node[below right]{$\varepsilon$} -- (3,0) node[below]{$R$};
+            \draw[postaction={decorate}] (3,0) arc [start angle=0, end angle=180, radius=3] node[pos=0.75, above left]{$c_R^+$};
+        \end{scope}
+        \draw[thick, -{Stealth[bend]}] (-0.5,0) arc [start angle=180, end angle=70, radius=0.5];
+        \draw[thick] (75:0.5) arc [start angle=75, end angle=0, radius=0.5] node[above, pos=0.6]{$c_\varepsilon^+$};
+        \draw (0,0) node[below]{$0$} pic{cross};
+        \fill
+            (-3,0) circle[radius=2pt]
+            (-0.5,0) circle[radius=2pt]
+            (0.5,0) circle[radius=2pt]
+            (3,0) circle[radius=2pt];
+    \end{tikzpicture}
+    \end{center}
+
     \begin{equation*}
         \int_{\gamma_{\varepsilon, R}} \frac{e^{iz}}{z} dz = 0 = \int_{[\hdots] \union [\hdots]} + \int_{c_\varepsilon^+} + \int_{c_R^+}
     \end{equation*}
@@ -881,7 +979,7 @@
             0, w \notin D \\ f(z) \in \Int(D)
         \end{cases}
     \end{equation*}
-    В глаза бросается факт, что случай $w \in \partial D$ остался нерассмотренным. Оказывается, что можно ввысти понятие \textit{полувычета}, и такой интеграл будет равен $\frac{f(z)}{2}$.
+    В глаза бросается факт, что случай $w \in \partial D$ остался нерассмотренным. Оказывается, можно ввести понятие \textit{полувычета}, и такой интеграл будет равен $\frac{f(z)}{2}$.
 \end{remark}
 
 \begin{remark}
@@ -922,7 +1020,7 @@
             e^{H_1(z)} = f(z) \\ e^{H_2(z)} = f(z)
         \end{cases} \Ra e^{H_1(z) - H_2(z)} = 2 i \pi k
     \end{equation*}
-    При этом $k$ не может меняться для фиксиованной пары функций $(H_1, H_2)$, потому что равенство выполнено при любом $z$ и $H_1 - H_2$ --- непрерывная функция.
+    При этом $k$ не может меняться для фиксированной пары функций $(H_1, H_2)$, потому что равенство выполнено при любом $z$ и $H_1 - H_2$ --- непрерывная функция.
 \end{remark}
 
 \begin{remark}
@@ -934,11 +1032,24 @@
 
     Рассмотрим интеграл $\int_\gamma H(w) dw$. Отметим две близкие точки $a, b$ на контуре $\gamma$ следующим образом:
 
-    % \begin{center}
-    % \begin{tikzpicture}
-        
-    % \end{tikzpicture}
-    % \end{center}
+    \begin{center}
+    \begin{tikzpicture}
+        \draw[thick, -{Stealth}] (0,-4) arc[start angle=-90, end angle=91, radius=4];
+        \draw[thick, -{Stealth}] (0,4) arc[start angle=90, end angle=271, radius=4] node[pos=0.2, left]{$\gamma$};
+        \fill
+            (-10:4) node[right]{$b$} circle[radius=2pt]
+            (10:4) node[right]{$a$} circle[radius=2pt];
+        \draw[dashed]
+            (10:3.5) arc[start angle=10, end angle=350, radius=3.5]
+            (-10:3.5) arc[start angle=170, end angle=-10, radius=0.5]
+            (-10:4.5) arc[start angle=-10, end angle=-350, radius=4.5]
+            (10:4.5) arc[start angle=10, end angle=-170, radius=0.5];
+        \draw
+            (70:2.4) pic{cross}
+            (-30:1) pic{cross}
+            (-150:2) pic{cross};
+    \end{tikzpicture}
+    \end{center}
 
     Обозначим часть $\gamma$ от $a$ до $b$ ("<от"> и "<до"> понимаются в смысле обхода $\gamma$ в правильном направлении, то есть эта часть будет почти всем контуром) как $\gamma_{ab}$. Достаточно малая окрестность $\gamma_{ab}$ не содержит нулей $f$ и односвязна, значит в ней можно определить $\log(f(z))$ как интеграл $\int_{a}^{z} H(w) dw$. Интеграл по части контура $\gamma_{ab}$ равен $\log(f(b)) - \log(f(a))$. 
     
@@ -946,13 +1057,86 @@
     
     Устремив точку $b$ к $a$, получим, что $\int_\gamma H(w) dw = i \Delta_{\arg f(z)}$.
 
-    Заметим, что $\gamma$ гомотопно объединению обходов нулей:
+    Заметим, что $\gamma$ гомотопно объединению обходов нулей $\gamma_1$:
 
-    % \begin{center}
-    % \begin{tikzpicture}
-        
-    % \end{tikzpicture}
-    % \end{center}
+    \begin{center}
+    \begin{tikzpicture}
+        \draw[thick, -{Stealth}] (0,-3) arc[start angle=-90, end angle=91, radius=3];
+        \draw[thick, -{Stealth}] (0,3) arc[start angle=90, end angle=271, radius=3] node[pos=0.2, above left]{$\gamma$};
+        \draw
+            (70:2) coordinate(a) pic{cross}
+            (-30:1) coordinate(b) pic{cross}
+            (-150:1.7) coordinate(c) pic{cross};
+        \draw[thick, -{Stealth}]
+            let \n1 = {0.5},
+                \p1 = ($(b) - (a)$),
+                \n2 = {veclen(\x1,\y1)},
+                \p2 = (\x1 * \n1 / \n2 * 1cm,\y1 * \n1 / \n2 * 1cm),
+                \n3 = {atan2(\y1,\x1)}
+            in
+                ++(a) +(\p2) arc[start angle=\n3, end angle=\n3+360, radius=\n1];
+        \draw[thick, -{Stealth[right]}]
+            let \n1 = {0.5},
+                \p1 = ($(b) - (a)$),
+                \n2 = {veclen(\x1,\y1)},
+                \p2 = (\x1 * \n1 / \n2 * 1cm,\y1 * \n1 / \n2 * 1cm)
+            in
+                ($(a) + (\p2)$) -- ($(b) - (\p2)$);
+        \draw[thick, -{Stealth[right]}]
+            let \n1 = {0.5},
+                \p1 = ($(b) - (a)$),
+                \n2 = {veclen(\x1,\y1)},
+                \p2 = (\x1 * \n1 / \n2 * 1cm,\y1 * \n1 / \n2 * 1cm)
+            in
+                ($(b) - (\p2)$) -- ($(a) + (\p2)$);
+        \draw[thick, -{Stealth}]
+            let \n1 = {0.5},
+                \p1 = ($(a) - (b)$),
+                \n2 = {veclen(\x1,\y1)},
+                \p2 = (\x1 * \n1 / \n2 * 1cm,\y1 * \n1 / \n2 * 1cm),
+                \n3 = {atan2(\y1,\x1)},
+                \p3 = ($(c) - (b)$),
+                \n4 = {veclen(\x3,\y3)},
+                \p4 = (\x3 * \n1 / \n4 * 1cm,\y3 * \n1 / \n4 * 1cm),
+                \n5 = {atan2(\y3,\x3)}
+            in
+                ($(b) + (\p2)$) arc[start angle=\n3, end angle=\n5+360, radius=\n1] node[above left, pos=0.5]{$\gamma_1$};
+        \draw[thick, -{Stealth}]
+            let \n1 = {0.5},
+                \p1 = ($(a) - (b)$),
+                \n2 = {veclen(\x1,\y1)},
+                \p2 = (\x1 * \n1 / \n2 * 1cm,\y1 * \n1 / \n2 * 1cm),
+                \n3 = {atan2(\y1,\x1)},
+                \p3 = ($(c) - (b)$),
+                \n4 = {veclen(\x3,\y3)},
+                \p4 = (\x3 * \n1 / \n4 * 1cm,\y3 * \n1 / \n4 * 1cm),
+                \n5 = {atan2(\y3,\x3)}
+            in
+                ($(b) + (\p4)$) arc[start angle=\n5, end angle=\n3, radius=\n1];
+        \draw[thick, -{Stealth}]
+            let \n1 = {0.5},
+                \p1 = ($(b) - (c)$),
+                \n2 = {veclen(\x1,\y1)},
+                \p2 = (\x1 * \n1 / \n2 * 1cm,\y1 * \n1 / \n2 * 1cm),
+                \n3 = {atan2(\y1,\x1)}
+            in
+                ++(c) +(\p2) arc[start angle=\n3, end angle=\n3+360, radius=\n1];
+        \draw[thick, -{Stealth[right]}]
+            let \n1 = {0.5},
+                \p1 = ($(b) - (c)$),
+                \n2 = {veclen(\x1,\y1)},
+                \p2 = (\x1 * \n1 / \n2 * 1cm,\y1 * \n1 / \n2 * 1cm)
+            in
+                ($(c) + (\p2)$) -- ($(b) - (\p2)$);
+        \draw[thick, -{Stealth[right]}]
+            let \n1 = {0.5},
+                \p1 = ($(b) - (c)$),
+                \n2 = {veclen(\x1,\y1)},
+                \p2 = (\x1 * \n1 / \n2 * 1cm,\y1 * \n1 / \n2 * 1cm)
+            in
+                ($(b) - (\p2)$) -- ($(c) + (\p2)$);
+    \end{tikzpicture}
+    \end{center}
 
     Теперь распишем интеграл $\int_\gamma H(w) dw = \int_\gamma \frac{f'(w)}{f(w)} dw$ на окружности малого радиуса вокруг $z_k$.
     \begin{gather*}
@@ -1331,14 +1515,466 @@
 
     Заметим, что $\varphi_0(a) = 0$. Предположим противное, $\varphi_0(a) \neq 0$. Тогда
     \begin{gather*}
-        \xi(z) = \frac{\varphi_0(z) - \varphi_0(a)}{1 - \overline{\varphi_0(a)} \varphi_0(z)} = \mu_{\varphi_0(a)} \circ \varphi_0 \\
-        \xi' = \frac{\varphi_0'(a)}{1 - \overline{\varphi_0(a)} \varphi_0(a)} = \frac{\varphi_0'(a)}{1 - |\varphi_0(a)|^2} \\
+        \psi(z) = \frac{\varphi_0(z) - \varphi_0(a)}{1 - \overline{\varphi_0(a)} \varphi_0(z)} = \mu_{\varphi_0(a)} \circ \varphi_0 \\
+        \psi' = \frac{\varphi_0'(a)}{1 - \overline{\varphi_0(a)} \varphi_0(a)} = \frac{\varphi_0'(a)}{1 - |\varphi_0(a)|^2} \\
         1 - |\varphi_0(a)|^2 \in \R, \leq 1
     \end{gather*}
-    Но тогда $\varphi_0$ --- не максимум $J$, потому что $J(\xi) > J(\varphi)$, противоречие.
+    Но тогда $\varphi_0$ --- не максимум $J$, потому что $J(\psi) > J(\varphi)$, противоречие.
 
-    Пусть $\varphi_0(G) \neq D$, $b \in D \setminus \varphi_0(G)$.
-    \todo{Дописать доказательство}.
+    Пусть $\varphi_0(G) \neq D$, $b \in D \setminus \varphi_0(G)$. Функция $\frac{\varphi_0(z) - b}{1 - \overline{b} \varphi_0(z)}$ однолистна и $\neq 0$. Тогда можно корректно определить $\psi(z) = \sqrt{\frac{\varphi_0(z) - b}{1 - \overline{b} \varphi_0(z)}}$. Это однолистная функция, действующая из $G$ в $D$.
+
+    Определим, наконец,
+    \begin{equation*}
+        h(z) = \frac{\psi(z) - \psi(a)}{1 - \overline{\psi(a)} \psi(z)} \in I
+    \end{equation*}
+    Вычислим $h'(a)$:
+    \begin{align*}
+        h'(a) &= \frac{\psi'(a)}{1 - |\psi(a)|^2} = \frac{\psi'(a)}{1 - |b|} \\
+        &= \frac{1}{1 - |b|} \cdot \frac{\left( \frac{\varphi_0(z) - b}{1 - \overline{b} \varphi_0(z)} \right)' \Big|_a}{2 \sqrt{\frac{\varphi_0(z) - b}{1 - \overline{b} \varphi_0(z)}} \Big|_a} \\
+        &= \frac{1}{1 - |b|} \cdot \frac{\varphi_0'(a) (1 + b(-\overline{b}))}{2 \sqrt{-b}} \\
+        &= \varphi_0'(a) \cdot \frac{1 - |b|^2}{2 (1 - |b|) \sqrt{-b}} \\
+        &= \varphi_0'(a) \cdot \frac{1 + |b|}{2 \sqrt{-b}}
+    \end{align*}
+    Множитель $\frac{1 + |b|}{2 \sqrt{-b}}$ по модулю больше 1, значит, $\varphi_0$ --- не максимум. Противоречие, значит, $\varphi_0(G) = D$.
 \end{proof}
+
+\begin{remark}
+    Из доказательства следует, что если $\varphi:G \to D$, $\varphi(G) = D$, то $\varphi(a)$ и $\arg \varphi'(a)$ вместе однозначно определяют $\varphi$.
+\end{remark}
+
+\begin{remark}
+    \todo{написать настоящую теорему}
+
+    Теорема Каратеодори: пусть $f:G \to D$, $f \in A(G)$, $f \in C(\overline{G})$, $f(\partial G) = \partial B$ --- однократное накрытие. Тогда для любого $w \in D$ равенство $f(z) = w$ имеет ровно одно решение, то есть $f(G) = B$ и $f$ --- однолистная.
+\end{remark}
+
+\todo{ковыряем автоморфизмы $\C^+$}.
+
+\begin{remark}
+    Приведём несколько примеров конформных отображений:
+    \begin{enumerate}
+        \item $f(z) = \frac{az + b}{cz + d}$, как мы уже знаем, отображает $\C^+$ в себя.
+        \item $f(z) = e^z$ переводит полосу $\{x + iy | x \in \R, 0 < y < 2\pi\}$ в $\C^+$.
+        \item $f(z) = z^\alpha$, где $\alpha \in \R$:
+        \begin{center}
+        \begin{tikzpicture}
+            
+        \end{tikzpicture}
+        \end{center}
+        \item $f(z) = \frac{z + \frac{1}{z}}{2}$ --- функция Жуковского.
+        \begin{center}
+        \begin{tikzpicture}
+            
+        \end{tikzpicture}
+        \end{center}
+    \end{enumerate}
+
+    Хочется предъявить конформное отображение между прямоугольником и кругом. Однако окажется, что это не так просто.
+\end{remark}
+
+\begin{proposition}[Принцип симметрии]
+    Пусть $G$ --- такая область в $\C^+$, что часть её границы лежит на вещественной прямой. Обозначим эту часть границы как $I$. Пусть также $f(I) \subset \R$, $f \in A(G)$, $f \in C(G \union I)$. Тогда $f$ можно аналитически продолжить на $G \union I \union \overline{G}$ (т.е. предъявить аналитическую на этой области функцию, которая будет совпадать с $f$ на $G$), где $\overline{G}$ --- сопряжение, оно же отражение относительно $\R$, области $G$.
+    \begin{center}
+    \begin{tikzpicture}
+        
+    \end{tikzpicture}
+    \end{center}
+\end{proposition}
+\begin{proof}
+    Определим для $z \in \overline{G}$ $f(z) = \overline{f(\overline{z})}$. $\overline{z} \in G$, поэтому $f(\overline{z})$ уже определено. Теперь покажем, что интеграл $f$ по любому прямоугольнику в $G \union I \union \overline{G}$ равен 0.
+    \begin{center}
+    \begin{tikzpicture}
+        
+    \end{tikzpicture}
+    \end{center}
+    Интеграл $f(z)dz$ по $P_1$ равен 0, т.к. $f$ аналитична в $G$, и верхний контур полностью лежит внутри $G$.
+
+    Рассмотрим интеграл по $P_3 = \overline{P_1}$, а точнее, сопряжение значения этого интеграла:
+    \begin{equation*}
+        \overline{\int_{P_3} \overline{f(\overline{z})} dz} = \int_{\overline{P_1}} f(\overline{z}) \overline{dz} = \int_{\overline{P_1}} f(\overline{z}) d\overline{z} = \int_{P_1} f(z) dz = 0
+    \end{equation*}
+
+    Интеграл по второму контуру стремится к 0 при $\varepsilon \to 0$.
+
+    Таким образом, $\int_P f(z)dz = 0 + 0 + 0 = 0$.
+\end{proof}
+
+\begin{remark}
+    Из определения, очевидно, следует, что если $f(G) = \Omega$, то $f(\overline{G}) = \overline{\Omega}$.
+    \begin{center}
+    \begin{tikzpicture}
+        
+    \end{tikzpicture}
+    \end{center}
+\end{remark}
+
+\begin{remark}
+    \todo{Рандомное замечание про порезанный диск}
+\end{remark}
+
+\begin{remark}
+    В принципе симметрии мы отражали область $G$ относительно отрезка. Вообще говоря, можно отражать и относительно дуги окружности: пусть часть границы $G$ лежит на единичной окружности, обозначим эту часть $I$. Пусть $f(I) \subset \partial D$, $f \in A(G)$, $f \in C(G \union I)$. Тогда $f$ можно аналитически продолжить на инверсию $G$ относительно единичной окружности (далее $G^*$), определив для $z \in G^*$ 
+    $$f(z) = \overline{\frac{1}{f\left(\frac{1}{\overline{z}}\right)}}$$
+    Доказательство проводится аналогично случаю отрезка. Также, аналогично случаю отрезка, область значений новой части функции есть отражение относительно окружности изначальной области значений.
+
+    Более того, аналогично можно делать, если $I \subset \R$ и $f(I) \subset \partial D$, или наоборот. Функция продолжается понятной комбинацией сопряжений и взятия $\frac{1}{\cdot}$, чтобы аргумент и значение отражались куда надо. Доказывается всё аналогично.
+\end{remark}
+
+\begin{remark}
+    Покажем, что условие односвязности области $G$ в теореме Римана существенно.
+\end{remark}
+
+\begin{proposition}
+    Пусть $G$ --- кольцо $A_{R_1, R_2}$. Тогда, если $\frac{R_1}{R_2} \neq \frac{R_1'}{R_2'}$, то $G$ не конформно инвариантно $A_{R_1',R_2'}$.
+\end{proposition}
+\begin{proof}
+    Предположим противное, $\varphi$ конформно переводит $A_{R_1, R_2}$ в $A_{R_1',R_2'}$. Тогда $\varphi$ переводит границу первого кольца, которая состоит из двух окружностей радиусов $R_1$ и $R_2$, в две граничные окружности второго кольца. Если большая окружность переходит в меньшую, то можно сделать замену переменной $z \mapsto \frac{1}{z}$. Далее считаем, что внешняя окружность переходит во внешнюю, а внутренняя --- во внутреннюю.
+
+    Гомотетиями можно добиться того, что $R_1 = R_1' = 1$. Радиусы полученных после этого внешних окружностей будем называть $r_2$ и $r_2'$ соответственно. Из условия знаем, что $r_2 \neq r_2'$.
+
+    Рассмотрим внутреннюю граничную окружность первого кольца. Она в точности является единичной окружностью, и переходит она в единичную окружность. Тогда, по теореме Каратеодори, $\varphi$ продолжается до автоморфизма $D$. Но тогда можно применить принцип симметрии, и расширить область определения $\varphi$ на отражение кольца $A_{1, r_2}$ относительно внутренней окружности.
+    \begin{center}
+    \begin{tikzpicture}
+        
+    \end{tikzpicture}
+    \end{center}
+
+    После этого мы получим кольцо $A_{1/r_2, r_2}$, и образ $\varphi$ будет равен $A_{1/r_2', r_2'}$. Техничности ради, применим гомотетии, обратные тем, которые мы сделали в начале рассуждения. Теперь $\varphi: A_{R_1/R_2, R_2} \to A_{R_1'/R_2', R_2'}$.
+
+    Последовательность действий "<растянуть, отразить внутрь, сжать"> повторим счётное число раз. Мы получим $\varphi: B_{R_2}(0) \setminus \{0\} \to B_{R_2'}(0) \setminus \{0\}$. По лемме об устранимой особенности \ref{noness}, можно считать, что $\varphi: B_{R_2}(0) \to B_{R_2'}(0)$, при этом $\varphi$ --- конформное отображение, и \todo{$\varphi(0) = 0$}. Но, как известно, такими $\varphi$ могут быть только повороты, что невозможно, т.к. $R_2 \neq R_2'$.
+\end{proof}
+
+\begin{remark}
+    Построим конформное отображение $\varphi$, которое переводило бы $\C^+$ в какой-нибудь прямоугольник. Для этого отобразим границу $\C^+$, т.е. вещественную прямую, в границу прямоугольника. Пусть точки $p_1, p_2, p_3, p_4 \in \R$ переходят в вершины прямоугольника.
+    \begin{center}
+    \begin{tikzpicture}
+        
+    \end{tikzpicture}
+    \end{center}
+    
+    Рассмотрим окрестность точки $p_i$. $\varphi$ должно отображать сектор с углом $\pi$ в угол прямоугольника, т.е. в сектор с углом $\frac{\pi}{2}$. Кандидатом на искомое отображение естественно рассмотреть
+    \begin{equation*}
+        \varphi(z) = \int_0^z \frac{dt}{\sqrt{1 - t^2} \sqrt{1 - k^2 t^2}}, \quad 0 < k < 1
+    \end{equation*}
+    Для такого отображения выделенными точками, которые должны переходить в вершины, будут $-\frac{1}{k}, -1, 1, \frac{1}{k}$.
+
+    Осталось проверить, что $\R$ при таком преобразовании переходит в стороны прямоугольника. Для этого рассмотрим случаи того, между какими из точек $-\frac{1}{k}, -1, 1, \frac{1}{k}$ лежит рассматриваемый $x \in \R$. Сначала заметим, что $\varphi(0) = 0$.
+    \begin{enumerate}
+        \item $x \in [0, 1)]$: $\varphi(x) = \int_0^x \frac{dt}{\sqrt{>0} \sqrt{>0}} \in \R$.
+        \item $x = 1$: $\varphi(1) = \int_0^1 \frac{dt}{\sqrt{1 - t^2} \sqrt{1 - k^2 t^2}}$ сходится, и равен некоторой вещественной константе $K$.
+        \item $x \in \left((1, \frac{1}{k})\right)$: $\varphi(x) = \int_0^1 + \int_1^x = K + \int_0^x \frac{dt}{\sqrt{<0} \sqrt{>0}}$. Второй интеграл чисто комплексный, поэтому $\varphi(x) \in K + i\R$.
+        \item $x = \frac{1}{k}$: $\varphi\left(\frac{1}{k}\right) = \int_0^1 + \int_1^{\frac{1}{k}} = K + iK'$.
+        \item $x > \frac{1}{k}$: $\varphi(x) = K + iK' + \int_{\frac{1}{k}}^x \frac{dt}{\sqrt{<0} \sqrt{<0}} \in K + iK' + \R$.
+    \end{enumerate}
+    При $x < 0$ случаи аналогичны, с теми же константами $K$ и $K'$.
+
+    Итого, мы получили, что при движении по $\R$ вправо начиная с 0, $\varphi(x)$ сначала идёт горизонтально вправо, потом вертикально вверх, потом горизонально влево. Поскольку образ $\R$ должен замкнуться, можно сделать вывод, что образ $\R$ есть прямоугольник:
+    \begin{center}
+    \begin{tikzpicture}
+        
+    \end{tikzpicture}
+    \end{center}
+\end{remark}
+
+\begin{remark}
+    \begin{gather*}
+        K = \int_0^1 \frac{dt}{\sqrt{1 - t^2} \sqrt{1 - k^2 t^2}} \\
+        K' = \int_1^{\frac{1}{k}} \frac{dt}{\sqrt{1 - t^2} \sqrt{1 - k^2 t^2}}
+    \end{gather*}
+    При $k \to 0$: $K \to const$, $K' \to +\infty$. При $k \to 1$: $K \to +\infty$, $K' \to const$. \todo{почему?}
+\end{remark}
+
+\begin{remark}
+    Аналогично можно перевести $\C^+$ в любой многоугольник: значения углов задаются степенями в знаменателе интеграла, а сами выражения под корнем фиксируют точки, которые будет переходить в вершины многоугольника.
+\end{remark}
+
+\begin{remark}
+    Для любых четырёх точек $p_1, p_2, p_3, p_4 \in \R$ найдётся $k$ такое, что эту четвёрку точек можно перевести автоморфизмом $\C^+$ в $-\frac{1}{k}, -1, 1, \frac{1}{k}$.
+\end{remark}
+
+\begin{remark}
+    Далее будем рассматривать функцию $f = \varphi^{-1}$. Заметим, что на нижней стороне прямоугольника $f$ принимает вещественные значения, значит, можно применить принцип симметрии. После этого заметим, что на большой вертикальной стороне полученного прямоугольника $f$ принимает чисто комплексные значения --- значит, снова можно применить принцип симметрии. Легко проверить, что не важно, в каком порядке отражать.
+    \begin{center}
+    \begin{tikzpicture}
+        
+    \end{tikzpicture}
+    \end{center}
+
+    Отражая, можно продолжить нашу функцию $f$ на всё $\C$. Полученная функция называется \textit{эллиптическим синусом}.
+\end{remark}
+
+\begin{remark}
+    Отметим несколько свойств функции $f$:
+    \begin{enumerate}
+        \item $f$ периодична:
+            \begin{equation*}
+                \begin{cases}
+                    f(z) = f(z + 4K) \\
+                    f(z) = f(z + 2iK')
+                \end{cases}
+            \end{equation*}
+        \item В точке $iK'$ и во всех её отражениях, т.е. в всех точках множества $2K\Z + 2iK'\Z + iK'$, $f$ принимает значение $\infty$. Таким образом, $f$ мероморфна, и в указанных точках имеет полюса.
+        \item Если рассмотреть малую окрестность полюса, то окажется, что $f$ в этой окрестности однолистна:
+        \begin{center}
+        \begin{tikzpicture}
+            
+        \end{tikzpicture}
+        \end{center}
+        \todo{подробнее}.
+        В окрестности полюса порядка $n$ функция ведёт себя как $c \cdot (z - z_0)^{-n}$. Но если $n \geq 2$, это означает, что функция не однолистна. Значит, полюса $f$ имеют порядок 1.
+    \end{enumerate}
+\end{remark}
+
+\begin{remark}
+    Вернёмся к вопросу про другие многоугольники. Пусть дан многоугольник с углами $\alpha_1, \hdots, \alpha_n$. Известно, что $\sum_{k = 1}^n \alpha_k = \pi(n - 2)$.
+
+    Хотим $\varphi$ из $\C^+$ в этот многоугольник. Поступим как раньше: отметим некоторые точки $a_1, \hdots, a_n \in \R$, и определим
+    \begin{equation*}
+        \varphi(z) = \int_0^z (t - a_1)^{\frac{\alpha_1}{\pi} - 1} \hdots (t - a_n)^{\frac{\alpha_n}{\pi} - 1} dt
+    \end{equation*}
+    Эта формула называется \textit{формулой Кристоффеля-Шварца}.
+
+    $\sum_k \left(\frac{\alpha_k}{\pi} - 1\right) = -2$, значит, $\varphi(\infty)$ действительно есть точка на границе многоугольника, поскольку интеграл сойдётся на $\infty$.
+
+    Легко проверить, что, аналогично случаю прямоугольника, при проходе вершины на вещественной оси образ $\R$ поворачивает на нужный угол, и дальше продолжает идти по прямой, т.е. что образ $\R$ действительно будет многоугольником с заданными углами. Некоторая неочевидность состоит в том, что длина стороны полученного многоугольника будет равна
+    \begin{equation*}
+        \left| \int_{a_k}^{a_{k+1}} \prod_{l = 1}^{n} (t - a_l)^{\frac{\alpha_l}{\pi} - 1} dt \right|
+    \end{equation*}
+    то есть чему-то совершенно не понятному. Как выбирать $a_i$ так, чтобы получались нужные длины, не ясно.
+\end{remark}
+
+\begin{remark}
+    Можно даже получать "<многоугольники">, у которых стороны могут уходить на бесконечность: для этого достаточно взять $\alpha_1, \hdots, \alpha_{n-1}$ такие, что $\sum_{k=1}^{n-1} \left(\frac{\alpha_k}{\pi} - 1\right) \geq -1$. Легко видеть, что любая ломаная с такими углами уйдёт на бесконечность, а также, что из-за этого неравенства интеграл разойдётся, так что $\varphi(\infty) = \infty$.
+\end{remark}
+
+\begin{remark}
+    В случае прямоугольника при $k \to 0$ в пределе получится
+    \begin{equation*}
+        \varphi(z) = \int_0^z \frac{dt}{\sqrt{1 - t^2}}
+    \end{equation*}
+    \begin{center}
+    \begin{tikzpicture}
+         
+    \end{tikzpicture}
+    \end{center}
+    Это $\arccos$.
+\end{remark}
+
+\begin{theorem}[Пикара о целых функциях]
+    $f(z)$ --- целая функция, которая не принимает значения $a, b \in \C$. Тогда $f(z) = const$.
+\end{theorem}
+\begin{proof}
+    Загадочно скажем, что обратная к модулярной функции ограничена.
+\end{proof}
+
+\begin{remark}
+    Что же такое модулярная функция? Не умаляя общности, $f(z) \neq 0, 1$. Пусть $\varphi: T_0 \to \C^+$ --- конформно инвариантное, $\varphi(A) = 0$, $\varphi(B) = 1$, $\varphi(C) = \infty$.
+    \begin{center}
+    \begin{tikzpicture}
+        \draw[thick, dashed] (0,0) circle[radius=5];
+        \draw[thick]
+            (210:5) node[below left]{$A$} arc[start angle=-60, end angle=0, radius={5*tan(60)}] --
+            (90:5) node[above]{$B$} arc[start angle=180, end angle=240, radius={5*tan(60)}] --
+            (-30:5) node[below right]{$C$} arc[start angle=60, end angle=120, radius={5*tan(60)}] -- (210:5) -- cycle;
+        % \drawctri{90}{210}{-30}{5};
+        \path (0,0) node{$T_0$};
+
+        \draw [-{Stealth}, thick]
+            (5.5,0) -- node[above]{$\varphi$} (6.5,0);
+
+        \draw (7,-0.5) -- (13,-0.5);
+        \begin{scope}
+            \clip (10,-0.5) circle(3);
+            \clip (7,-0.5) rectangle (13,3);
+            \foreach \x in {-4.0,-3.8,...,4.0}
+            {
+                \draw ++(10,-0.5) +({-2 + \x},-4) -- +({2 + \x},4);
+            }
+        \end{scope}
+        \fill (9,-0.5) node[below]{$\varphi(A)$} circle[radius=2pt]
+            (11,-0.5) node[below]{$\varphi(B)$} circle[radius=2pt];
+        \path (7.3,2) node{$\C^+$};
+    \end{tikzpicture}
+    \end{center}
+
+    Поскольку дуги $AB, BC, CA$ переходят в части $\R$, можно применить принцип симметрии. Отражая относительно каждой из них, получаем 3 криволинейных треугольника, у которых так же стороны являются дугами окружностей, которые перпедикулярны $\partial D$. Назовём их $T_1, T_2, T_3$. Каждый из них можно отразить относительно любой из трёх сторон; относительно одной из них получится $T_0$, а относительно двух других --- снова треугольники такого же вида. Будем отражать всеми возможными способами; через счётное число отражений треугольники замостят весь круг.
+    \begin{center}
+    \begin{tikzpicture}
+        \draw[thick, dashed] (0,0) circle[radius=5];
+        
+        \drawctri{90}{-30}{210}{5}
+        \foreach \da in {0, 1, 2} {
+        \pgfmathtruncatemacro{\step}{60 / pow(2,\da)}
+        \pgfmathtruncatemacro{\stepn}{90 + 60 / pow(2,\da)}
+        \pgfmathtruncatemacro{\end}{90 + 360 - \step}
+        \foreach \sa in {90, \stepn, ..., \end} {
+            \pgfmathtruncatemacro{\a}{\sa + 30 / pow(2,\da)}
+            \pgfmathtruncatemacro{\aa}{\sa + 60 / pow(2,\da)}
+            \drawctri{\sa}{\a}{\aa}{5}
+            }
+        }
+        \path (0,0) node{$T_0$};
+        \path (150:2.5) node{$T_1$};
+        \path (30:2.5) node{$T_2$};
+        \path (-90:2.5) node{$T_3$};
+    \end{tikzpicture}
+    \end{center}
+
+    Полученную таким образом функцию назовём $\mu: D \to \C$. Это и есть \textit{модулярная функция}. Изучим структуру $\mu$. Каждый треугольник в $D$ соседствует с тремя другими. При этом каждая из сторон треугольника переходит в $(0,1)$, или в $(1,+\infty)$, или в $(-\infty,-1)$, а сам треугольник отображается либо в $\C^+$, либо в $\C^-$. Отметим, что в точки $0, 1$ ничего не переходит.
+    \begin{center}
+    \begin{tikzpicture}
+        \draw[thick, dashed] (0,0) circle[radius=5];
+        
+        \drawctri[fillc=red!20]{90}{-30}{210}{5}
+        \foreach \da in {0, 1, 2, 3} {
+        \pgfmathtruncatemacro{\step}{120 / pow(2,\da)}
+        \pgfmathtruncatemacro{\steph}{60 / pow(2,\da)}
+        \pgfmathtruncatemacro{\stepn}{90 + \step}
+        \pgfmathtruncatemacro{\end}{90 + 360 - \step}
+        \foreach \sa in {90, \stepn, ..., \end} {
+            \pgfmathtruncatemacro{\a}{\sa + \steph}
+            \pgfmathtruncatemacro{\aa}{\sa + \step}
+            \pgfmathtruncatemacro{\n}{(\sa - 90) / \step}
+            \pgfmathtruncatemacro{\x}
+                {\intcalcMod{\da}{2} * (\intcalcMod{2 - \n}{3}) + (\intcalcMod{\da + 1}{2}) * (\intcalcMod{(1 - \intcalcMod{\n}{3})}{3})}
+            \pgfmathtruncatemacro{\y}
+                {\intcalcMod{\da}{2} * (\intcalcMod{-\n}{3}) + (\intcalcMod{\da + 1}{2}) * (\intcalcMod{(2 - \intcalcMod{\n}{3})}{3})}
+            \pgfmathtruncatemacro{\z}
+                {\intcalcMod{\da + 1}{2} * (\intcalcMod{\n + 2}{3}) + (\intcalcMod{\da}{2}) * (\intcalcMod{(1 - \intcalcMod{\n}{3})}{3})}
+            \drawctri[line1={\pickc{\x}},
+                    line2={\pickc{\y}}, 
+                    line3={\pickc{\z}}, 
+                    fillc={\ifodd \da red!20\else blue!20\fi}]{\sa}{\a}{\aa}{5}
+            }
+        }
+        \path (0,0) node{$T_0$};
+        \path (150:2.5) node{$T_1$};
+        \path (30:2.5) node{$T_2$};
+        \path (-90:2.5) node{$T_3$};
+
+        \draw [-{Stealth}, thick]
+            (5.5,0) -- node[above]{$\varphi$} (6.5,0);
+
+        % \draw (7,0) -- (13,0);
+        \begin{scope}
+            \clip (10,0) circle(3);
+            \clip (7,0) rectangle (13,3);
+            \foreach \x in {-4.0,-3.8,...,4.0}
+            {
+                \draw[color=red] ++(10,0) +({-2 + \x},-4) -- +({2 + \x},4);
+            }
+        \end{scope}
+        \begin{scope}
+            \clip (10,0) circle(3);
+            \clip (7,0) rectangle (13,-4);
+            \foreach \x in {-4.0,-3.8,...,4.0}
+            {
+                \draw[color=blue] ++(10,0) +({-2 + \x},-4) -- +({2 + \x},4);
+            }
+        \end{scope}
+        \draw[thick, color=green] (7,0) -- (9,0);
+        \draw[thick, color=red] (9,0) -- (11,0);
+        \draw[thick, color=blue] (11,0) -- (13,0);
+        \fill[color=white] (9,0) circle[radius=2pt]
+            (11,0) circle[radius=2pt];
+        \draw[thick] (9,0) circle[radius=2pt]
+            (11,0) circle[radius=2pt];  
+        \path (7.3,2.5) node{$\C$};
+    \end{tikzpicture}
+    \end{center}
+    
+    Склеим полуплоскости-образы соседних треугольников по образам общих сторон. Получившуюся поверхность назовём $\mathfrak{R}$. Функцию $\mu$ можно рассматривать как функцию из $D$ в $\mathfrak{R}$ --- каждый треугольник из $D$ переходит в свою полуплоскость, и переход из одного треугольника в другой в $D$ соответствует переходу через склеенный интервал между соответствующими полуплоскостями.
+    % \begin{center}
+    % \begin{tikzpicture}
+         
+    % \end{tikzpicture}
+    % \end{center}
+
+    Покажем, что $\mu: D \to \mathfrak{R}$ однолистна. Это практически очевидно, поскольку внутри каждого треугольника $\mu$ есть просто несколько раз отражённая $\varphi: T_0 \to \C^+$, которая, конечно, однолистна. Между треугольниками же значения не повторяются, потому что лежат в разных полуплоскостях-образах.
+
+    В доказательстве говорилось о функции, обратной к модулярной, то есть о $\mu^{-1}: \mathfrak{R} \to D$. Понятно, что полуплоскость-образ должна переходить в некоторый треугольник, но как определить, в какой именно? Заметим, что полуплоскости-образы образуют весьма простую структуру: если обозначить каждую полуплоскость-образ за вершину в (бесконечном) графе, а рёбрами соединить все склеенные по интервалу полуплоскости-образы, то получится 3-регулярное дерево (т.е. дерево, в котором все вешины имеют степень 3) --- $\mathfrak{R}$ по построению наследует эту структуру от замощения $D$ треугольниками.
+    \begin{center}
+    \begin{tikzpicture}
+        \draw[thick, dashed] (0,0) circle[radius=5];
+        
+        \drawctri[fillc=red!20]{90}{-30}{210}{5}
+        \foreach \da in {0, 1, 2, 3} {
+        \pgfmathtruncatemacro{\step}{120 / pow(2,\da)}
+        \pgfmathtruncatemacro{\steph}{60 / pow(2,\da)}
+        \pgfmathtruncatemacro{\stepn}{90 + \step}
+        \pgfmathtruncatemacro{\end}{90 + 360 - \step}
+        \foreach \sa in {90, \stepn, ..., \end} {
+            \pgfmathtruncatemacro{\a}{\sa + \steph}
+            \pgfmathtruncatemacro{\aa}{\sa + \step}
+            \pgfmathtruncatemacro{\n}{(\sa - 90) / \step}
+            \pgfmathtruncatemacro{\x}
+                {\intcalcMod{\da}{2} * (\intcalcMod{2 - \n}{3}) + (\intcalcMod{\da + 1}{2}) * (\intcalcMod{(1 - \intcalcMod{\n}{3})}{3})}
+            \pgfmathtruncatemacro{\y}
+                {\intcalcMod{\da}{2} * (\intcalcMod{-\n}{3}) + (\intcalcMod{\da + 1}{2}) * (\intcalcMod{(2 - \intcalcMod{\n}{3})}{3})}
+            \pgfmathtruncatemacro{\z}
+                {\intcalcMod{\da + 1}{2} * (\intcalcMod{\n + 2}{3}) + (\intcalcMod{\da}{2}) * (\intcalcMod{(1 - \intcalcMod{\n}{3})}{3})}
+            \drawctri[line1={\pickc{\x}},
+                    line2={\pickc{\y}}, 
+                    line3={\pickc{\z}}, 
+                    fillc={\ifodd \da red!20\else blue!20\fi}]{\sa}{\a}{\aa}{5}
+            }
+        }
+        \path (0,0) node{$T_0$};
+        \path (150:2.5) node{$T_1$};
+        \path (30:2.5) node{$T_2$};
+        \path (-90:2.5) node{$T_3$};
+
+        \draw [->,decorate,decoration={snake,amplitude=.4mm,segment length=2mm,post length=1mm}, thick]
+            (5.5,0) -- (6.5,0);
+
+        \begin{scope}[shift={(10,0)}]
+            \node[circle, draw, fill=red!20] (a1) at (0,0) {};
+            \node[circle, draw, fill=blue!20, scale=0.8] (b1) at (30:2) {};
+            \node[circle, draw, fill=blue!20, scale=0.8] (b2) at (150:2) {};
+            \node[circle, draw, fill=blue!20, scale=0.8] (b3) at (-90:2) {};
+            \draw[thick, double=blue, double distance=2pt] (a1) -- (b1);
+            \draw[thick, double=red, double distance=2pt] (a1) -- (b2);
+            \draw[thick, double=green, double distance=2pt] (a1) -- (b3);
+            \node[circle, draw, fill=red!20, scale=0.6] (c1) at ($(b1) + (90:1)$) {};
+            \node[circle, draw, fill=red!20, scale=0.6] (c2) at ($(b1) + (-30:1)$) {};
+            \node[circle, draw, fill=red!20, scale=0.6] (c6) at ($(b2) + (90:1)$) {};
+            \node[circle, draw, fill=red!20, scale=0.6] (c5) at ($(b2) + (210:1)$) {};
+            \node[circle, draw, fill=red!20, scale=0.6] (c4) at ($(b3) + (210:1)$) {};
+            \node[circle, draw, fill=red!20, scale=0.6] (c3) at ($(b3) + (-30:1)$) {};
+            \draw[thick, double=red, double distance=2pt] (b1) -- (c1);
+            \draw[thick, double=green, double distance=2pt] (b1) -- (c2);
+            \draw[thick, double=green, double distance=2pt] (b2) -- (c5);
+            \draw[thick, double=blue, double distance=2pt] (b2) -- (c6);
+            \draw[thick, double=blue, double distance=2pt] (b3) -- (c3);
+            \draw[thick, double=red, double distance=2pt] (b3) -- (c4);
+            \node[rotate=150] at ($(c1) + (150:0.5)$) {$\cdots$};
+            \node[rotate=30] at ($(c1) + (30:0.5)$) {$\cdots$};
+            \node[rotate=30] at ($(c2) + (30:0.5)$) {$\cdots$};
+            \node[rotate=-90] at ($(c2) + (-90:0.5)$) {$\cdots$};
+            \node[rotate=30] at ($(c3) + (30:0.5)$) {$\cdots$};
+            \node[rotate=-90] at ($(c3) + (-90:0.5)$) {$\cdots$};
+            \node[rotate=-90] at ($(c4) + (-90:0.5)$) {$\cdots$};
+            \node[rotate=150] at ($(c4) + (150:0.5)$) {$\cdots$};
+            \node[rotate=-90] at ($(c5) + (-90:0.5)$) {$\cdots$};
+            \node[rotate=150] at ($(c5) + (150:0.5)$) {$\cdots$};
+            \node[rotate=150] at ($(c6) + (150:0.5)$) {$\cdots$};
+            \node[rotate=30] at ($(c6) + (30:0.5)$) {$\cdots$};
+        \end{scope}
+    \end{tikzpicture}
+    \end{center}
+    
+    Осталось только зафиксировать полуплоскость-образ, которая будет переходить в $T_0$, после чего отправлять полуплоскости-образы, склеенные с уже рассмотренными, в треугольники, соседние с сопоставленными треугольниками. Это завершает определение $\mu^{-1}$.
+    % \begin{center}
+    % \begin{tikzpicture}
+         
+    % \end{tikzpicture}
+    % \end{center}
+
+    Из определения ясно, что $\mathfrak{R}$ накрывает $\C \setminus \{0,1\}$. $f: \C \to \C \setminus \{0,1\}$, значит, $f(\pi_1(\C)) = f(\{1\}) = \{1\} \subset \{1\} = p_*(\pi_1(\mathfrak{R}))$. Тогда, по теореме о поднятии отображений, существует $\tilde{f}: \C \to \mathfrak{R}$ такое, что $p \circ \tilde{f} = f$.
+
+    Композиция $\mu^{-1}(\tilde{f})$ действует из $\C$ в $D$, то есть она ограничена. По теореме Лиувилля \ref{liuv} из этого следует, что $\mu^{-1}(\tilde{f}) \equiv const$. Поскольку $\mu$ однолистна, т.е. инъективна, это влечёт $\tilde{f} \equiv const$, а тогда и $f = p \circ \tilde{f} \equiv const$. Об этом и шла речь в доказательстве!
+\end{remark}
+
+\todo{Дальше на чиле, на гармонии...}
 
 \end{document}
