@@ -23,7 +23,7 @@
 % \tikzexternalize[prefix=tikz/]
 % \tikzexternaldisable
 % \usepackage{xcolor}
-\usepackage{mathabx}
+% \usepackage{mathabx}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta}
 \usetikzlibrary{decorations.pathmorphing}
@@ -595,6 +595,7 @@
 \end{remark}
 
 \begin{proposition}
+\label{nodensezeros}
     $G$ --- связная область, $f, g$ аналитичны в $G$, и в открытом $U \subset G$ $f \equiv g$. Тогда $f \equiv g$ во всём $G$.
 \end{proposition}
 \begin{proof}
@@ -1471,6 +1472,7 @@
 \end{definition}
 
 \begin{theorem}[Римана]
+\label{riemann}
     $G$ --- односвязная область в $\hat{\C}$, $|\partial G| \geq 2$. Тогда $G$ переводится в единичный открытый диск $D$ конформным отображением.
 \end{theorem}
 \begin{proof}
@@ -1573,6 +1575,7 @@
 \end{remark}
 
 \begin{proposition}[Принцип симметрии]
+\label{simm}
     Пусть $G$ --- такая область в $\C^+$, что часть её границы лежит на вещественной прямой. Обозначим эту часть границы как $I$. Пусть также $f(I) \subset \R$, $f \in A(G)$, $f \in C(G \union I)$. Тогда $f$ можно аналитически продолжить на $G \union I \union \overline{G}$ (т.е. предъявить аналитическую на этой области функцию, которая будет совпадать с $f$ на $G$), где $\overline{G}$ --- сопряжение, оно же отражение относительно $\R$, области $G$.
     \begin{center}
     \begin{tikzpicture}
@@ -1975,6 +1978,149 @@
     Композиция $\mu^{-1}(\tilde{f})$ действует из $\C$ в $D$, то есть она ограничена. По теореме Лиувилля \ref{liuv} из этого следует, что $\mu^{-1}(\tilde{f}) \equiv const$. Поскольку $\mu$ однолистна, т.е. инъективна, это влечёт $\tilde{f} \equiv const$, а тогда и $f = p \circ \tilde{f} \equiv const$. Об этом и шла речь в доказательстве!
 \end{remark}
 
-\todo{Дальше на чиле, на гармонии...}
+\begin{remark}
+    Далее зададимся глобальным вопросом о том, при каких условиях функцию, аналитическую в области (односвязной с границей большей, чем одна точка), можно аналитически продолжить за эту область. Мы уже получили одно утверждение такого характера --- принцип симметрии \ref{simm}. Заметим, что в силу теоремы Римана \ref{riemann} любая такая область конформно инвариантна $D$, поэтому будет рассматривать только функции, действующие из $D$.
+\end{remark}
+
+\begin{remark}
+    Оказывается, продолжить можно не любую функцию. Определим \textit{функцию Блоха}
+    \begin{equation*}
+        f(z) = \sum_{n = 0}^{+\infty} z^{2^n} = z + z^2 + z^4 + \hdots
+    \end{equation*}
+    Этот ряд, очевидно, сходится, при $|z| < 1$. Однако для любого $N \in \N$
+    \begin{equation*}
+        f(r e^{2 \pi i \cdot \frac{k}{2^N}}) = \sum_{n = 0}^{N-1} z^{2^n} + \sum_{n = N}^{+\infty} r^{2^n}
+    \end{equation*}
+    Из этого следует, что при таком $z$ при $r \to 1$ $f \to \infty$.
+
+    Поскольку $k, N$ любые, точки вида $r e^{2 \pi i \cdot \frac{k}{2^N}}$ плотны в $\partial D$. Тогда ясно, что $f$ не может аналитически продолжаться в любую область $\supsetneq D$.
+\end{remark}
+
+\begin{remark}
+    Аналогично функции Блоха, если мы построим функцию, у которой множество нулей плотно на единичной окружности, она тоже не будет продолжаться за $D$, ведь тогда по \ref{nodensezeros} эта функция будет $\equiv 0$.
+
+    Строить такую функцию хочется, последовательно умножая на мономы $\frac{|z_k|}{z_k} \cdot \frac{z_k - z}{1 - \overline{z_k} z}$, где $z_k \in D$ --- желаемый ноль $f$. При конечном числе добавленных нулей это произведение хорошо определено. Каждый множитель по модулю $\leq 1$, значит, при бесконечном числе множителей это произведение ограничено. Поймём, при каких условиях оно не равно нулю ни в каких точках, кроме $z_k$.
+\end{remark}
+
+\begin{definition}[Конечное произведение Бляшке]
+    Пусть $\{z_k\}_{k=1}^n \subset D$. Тогда
+    \begin{equation*}
+        B_n(z) = \prod_{k = 1}^{n} \frac{|z_k|}{z_k} \cdot \frac{z_k - z}{1 - \overline{z_k} z}
+    \end{equation*}
+\end{definition}
+
+\begin{definition}[Произведение Бляшке]
+    Пусть $\{z_k\}_{k=1}^{+\infty} \subset D$, в любом круге радиуса $r < 1$ конечное число $z_k$.
+    \begin{equation*}
+        B(z) = \prod_{k = 1}^{+\infty} \frac{|z_k|}{z_k} \cdot \frac{z_k - z}{1 - \overline{z_k} z}
+    \end{equation*}
+\end{definition}
+
+\begin{proposition}
+    $B(z)$ сходится $\iff \sum_{k = 1}^{+\infty} (1 - |z_k|) < +\infty$
+\end{proposition}
+\begin{proof}
+    $\Ra$: Если $B(z)$ сходится, то, в частности, $B(0) \neq 0$. Как известно,
+    \begin{equation*}
+        B(0) = \prod_{k = 1}^{+\infty} \frac{|z_k|}{z_k} \cdot \frac{z_k - 0}{1 - \overline{z_k} 0} = \prod_{k = 1}^{+\infty} |z_k| \neq 0 \Ra \sum_{k = 1}^{+\infty} (1 - |z_k|) < +\infty
+    \end{equation*}
+
+    $\La$:
+    \begin{align*}
+        \frac{|z_k|}{z_k} \cdot \frac{z_k - z}{1 - \overline{z_k} z} &= |z_k| \frac{1 = \frac{z}{z_k}}{1 - \overline{z_k}z} \\
+        &= |z_k| \left( 1 + \frac{\overline{z_k}z - \frac{z}{z_k}}{1 - \overline{z_k}z} \right) \\
+        &= |z_k| + \frac{|z_k| \overline{z_k} z - \frac{|z_k| z}{z_k}}{1 - \overline{z_k} z} - 1 + 1 \\
+        &= 1 + (|z_k| - 1) + \frac{|z_k|^3 z - |z_k| z}{z_k - |z_k|^2 z} \\
+        &= 1 + (|z_k| - 1) + \frac{z |z_k| (|z_k|^2 - 1)}{z_k - |z_k|^2 z} \\
+        &= 1 + (|z_k| - 1) \left( 1 + \frac{z |z_k| (|z_k| + 1)}{z_k (1 - \overline{z_k} z)} \right)
+    \end{align*}
+
+    Зафиксируем $z$, $|z| < 1$.
+    \begin{equation*}
+        \left| \frac{|z_k|}{z_k} \right| = 1, \quad ||z_k| + 1| < 2, \quad \left| \frac{z}{1 - \overline{z_k} z} \right| < \frac{|z|}{1 - |z|} = C(z)
+    \end{equation*}
+    Тогда для этого $z$
+    \begin{equation*}
+        |B(z)| < \prod_{k = 1}^{+\infty} \left| 1 + (|z_k| - 1) \left( 1 + \frac{z |z_k| (|z_k| + 1)}{z_k (1 - \overline{z_k} z)} \right) \right| < \prod_{k = 1}^{+\infty} \left( 1 + (1 - |z_k|) \cdot C(z) \right)
+    \end{equation*}
+    
+    Произведение $\prod_{k = 1}^{+\infty} (1 + w_k)$ сходится, если $\sum_{k = 1}^{+\infty} |w_k| < +\infty$, где $w_k = (1 - |z_k|) \cdot C(z)$.
+\end{proof}
+
+\begin{remark}
+    Условие $\sum_{k = 1}^{+\infty} (1 - |z_k|) < +\infty$ называют \textit{условием Бляшке}.
+\end{remark}
+
+\begin{remark}
+    \todo{Легко видеть}, что для если условие Бляшке выполняется, для последовательности $\{B_n(z)\}$ выполнены условия утверждения \ref{uccs}. Таким образом, если функция $B(z)$ сходится, то она и аналитична в $D$.
+\end{remark}
+
+\begin{remark}
+    Приведём пример, когда $B(z)$ действительно нельзя продолжить за $D$. Пусть
+    \begin{equation*}
+        r_n = 1 - \frac{1}{2^n}, \theta_{n,k} = 2 \pi i \frac{k}{n}, \quad n = 0, 1, 2, \hdots, \quad 0 \leq k < n
+    \end{equation*}
+    Если взять $\{r_n e^{\theta_{n,k}}\}$ в качестве $\{z_k\}$, условие Бляшке будет выполняться, значит, $B(z)$ сходится. При этом $\partial D \subset \Cl (\{z_k\})$, из чего, как мы уже знаем, следует непродолжимость за $D$.
+\end{remark}
+
+\begin{remark}
+    Рассмотрим в некотором смысле более прямолинейный способ задать аналитическую функцию в $D$. Формула Коши утверждает, что
+    \begin{equation*}
+        f(z) = \frac{1}{2 \pi i} \int_{\gamma} \frac{f(\xi)}{\xi - z} d \xi 
+    \end{equation*}
+    где $\gamma$ гомотопна окружности, и $\gamma$ обходит вокруг $z$ 1 раз. По этой формуле можно получать значения функции внутри контура $\gamma$, зная только значения на самом контуре. Воспользуемся этим --- определим функцию $g \in L^1(\gamma)$и скажем, что
+    \begin{equation*}
+        f(z) = \frac{1}{2 \pi i} \int_{\gamma} \frac{g(\xi)}{\xi - z} d \xi
+    \end{equation*}
+
+    Далее будем рассматривать $\gamma = \partial D$.
+\end{remark}
+
+\begin{remark}
+    Пусть $f$ аналитична в $B_{1 + \varepsilon}(0)$. $f(z) = u(z) + i v(z)$. Не умаляя общности будем считать $v(0) = 0$, иначе $f$ можно домножить на унимодулярную константу. Попробуем выразить $f$ через значения на $\partial D$ не самой $f$, а $u$.
+    \begin{equation*}
+        f(z) = \sum_{n = 0}^{+\infty} a_n z^n, a_n \in \C, \quad z = r e^{i \theta}, 0 \leq r < 1, \theta \in [0, 2 \pi)
+    \end{equation*}
+    \begin{align*}
+        u(z) &= \Re f(z) \\
+        &= \Re \left( \sum_{n = 0}^{+\infty} a_n z^n \right) \\
+        &= a_0 + \frac{1}{2} \left( \sum_{n = 1}^{+\infty} a_n z^n + \overline{a_n} \overline{z}^n \right) \\
+        &= a_0 + \frac{1}{2} \left( \sum_{n = 1}^{+\infty} a_n r^n e^{i n \theta} + \overline{a_n} r^n e^{-i n \theta} \right)
+    \end{align*}
+
+    Подставим $r = 1$:
+    \begin{equation*}
+        u(e^{i \theta}) = a_0 + \frac{1}{2} \left( \sum_{n = 1}^{+\infty} a_n e^{i n \theta} + \overline{a_n} e^{-i n \theta} \right)
+    \end{equation*}
+    Из этого видно, что
+    \begin{gather*}
+        a_0 = \frac{1}{2 \pi} \int_{0}^{2 \pi} u(e^{i t}) d t \\
+        a_n = \frac{1}{\pi} \int_{0}^{2 \pi} u(e^{i t}) e^{- i n t} d t
+    \end{gather*}
+
+    Подставим полученные выражения в цепочку равенств:
+    \begin{align*}
+        u(z) &= a_0 + \frac{1}{2} \left( \sum_{n = 1}^{+\infty} a_n r^n e^{i n \theta} + \overline{a_n} r^n e^{-i n \theta} \right) \\
+        &= \frac{1}{2 \pi} \int_{0}^{2 \pi} u(e^{i t}) d t + \frac{1}{2} \left( \sum_{n = 1}^{+\infty} \frac{1}{2 \pi} \int_{0}^{2 \pi} u(e^{i t}) e^{- i n t} d t \cdot r^n e^{i n \theta} + \frac{1}{2 \pi} \int_{0}^{2 \pi} u(e^{i t}) e^{i n t} d t \cdot r^n e^{i n \theta} \right) \\
+        &= \frac{1}{2 \pi} \int_{0}^{2 \pi} u(e^{i t}) \left( 1 + \sum_{n = 1}^{+\infty} r^n e^{i n (\theta - t)} + \sum_{n = -\infty}^{-1} r^n e^{- i n (\theta - t)} \right) dt
+    \end{align*}
+
+    Если обозначить $q = r e^{i (\theta - t)}$, то выражение в скобках можно переписать как
+    \begin{equation*}
+        \frac{1}{1 - q} + \frac{\overline{q}}{1 + \overline{q}} = \frac{1 - r^2}{1 + r^2 - 2 r \cos(\theta - t)} = \Re \left( \frac{e^{it} + z}{e^{it} - z} \right)
+    \end{equation*}
+
+    Итого
+    \begin{align*}
+        u(z) &= \frac{1}{2 \pi} \int_{0}^{2 \pi} u(e^{i t}) \Re \left( \frac{e^{it} + z}{e^{it} - z} \right) dt \\
+        &= \Re \left( \frac{1}{2 \pi} \int_{0}^{2 \pi} u(e^{i t}) \frac{e^{it} + z}{e^{it} - z} dt \right)
+    \end{align*}
+    Но также $u(z) = \Re(f(z))$. Если у двух аналитических функций совпадают вещественные части, то и сами эти функции совпадают, значит
+    \begin{equation*}
+        f(z) = \frac{1}{2 \pi} \int_{0}^{2 \pi} u(e^{i t}) \frac{e^{it} + z}{e^{it} - z} dt
+    \end{equation*}
+
+    Выражение $\frac{1}{2 \pi} \frac{e^{it} + z}{e^{it} - z}$ называют \textit{ядром Шварца}.
+\end{remark}
 
 \end{document}
